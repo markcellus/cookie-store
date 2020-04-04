@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "lib": ["es2017", "dom"],
+    "allowJs": true,
+    "checkJs": true,
+    "strict": false,
+    "noImplicitThis": true,
+    "alwaysStrict": true,
+    "esModuleInterop": true,
+    "noEmit": false,
+    "declaration": true
+  },
+  "include": ["index.js"],
+  "files": ["types.ts"]
+}

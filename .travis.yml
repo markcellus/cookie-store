@@ -1,0 +1,8 @@
+language: node_js
+node_js:
+  - '10'
+after_script:
+  - 'npm run coveralls'
+branches:
+  only:
+    - master
