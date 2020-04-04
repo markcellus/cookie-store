@@ -20,6 +20,8 @@
   "types": "index.d.ts",
   "repository": "mkay581/cookie-store",
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^2.26.0",
+    "@typescript-eslint/parser": "^2.26.0",
     "banner-cli": "^0.14.1",
     "eslint": "^6.8.0",
     "esm": "^3.2.25",
@@ -41,11 +43,9 @@
     "node": ">= 10.16"
   },
   "scripts": {
-    "test": "npm run lint",
+    "test": "eslint '**/*.ts'",
     "preversion": "npm test",
     "banner": "banner-cli index.js",
-    "lint": "npm run lint:js && npm run lint:types",
-    "lint:js": "eslint '**/*.{js,ts}'",
     "build": "tsc",
     "coveralls": "cat .coverage/lcov.info | coveralls"
   }

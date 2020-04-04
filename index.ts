@@ -3,9 +3,9 @@
  * @private
  */
 
-var decode = decodeURIComponent;
-var encode = encodeURIComponent;
-var pairSplitRegExp = /; */;
+const decode = decodeURIComponent;
+const encode = encodeURIComponent;
+const pairSplitRegExp = /; */;
 
 /**
  * RegExp to match field-content in RFC 7230 sec 3.2
@@ -16,7 +16,23 @@ var pairSplitRegExp = /; */;
  */
 
 // eslint-disable-next-line no-control-regex
-var fieldContentRegExp = /^[\u0009\u0020-\u007e\u0080-\u00ff]+$/;
+const fieldContentRegExp = /^[\u0009\u0020-\u007e\u0080-\u00ff]+$/;
+
+/**
+ * Try decoding a string using a decoding function.
+ *
+ * @param {string} str
+ * @param {function} decode
+ * @private
+ */
+
+function tryDecode(str, decode) {
+  try {
+    return decode(str);
+  } catch (e) {
+    return str;
+  }
+}
 
 /**
  * Parse a cookie header.
@@ -35,22 +51,22 @@ function parse(str, options: any = {}) {
     throw new TypeError('argument str must be a string');
   }
 
-  var obj = {};
-  var opt = options || {};
-  var pairs = str.split(pairSplitRegExp);
-  var dec = opt.decode || decode;
+  const obj = {};
+  const opt = options || {};
+  const pairs = str.split(pairSplitRegExp);
+  const dec = opt.decode || decode;
 
-  for (var i = 0; i < pairs.length; i++) {
-    var pair = pairs[i];
-    var eq_idx = pair.indexOf('=');
+  for (let i = 0; i < pairs.length; i++) {
+    const pair = pairs[i];
+    let eqIdx = pair.indexOf('=');
 
     // skip things that don't look like key=value
-    if (eq_idx < 0) {
+    if (eqIdx < 0) {
       continue;
     }
 
-    var key = pair.substr(0, eq_idx).trim();
-    var val = pair.substr(++eq_idx, pair.length).trim();
+    const key = pair.substr(0, eqIdx).trim();
+    let val = pair.substr(++eqIdx, pair.length).trim();
 
     // quoted values
     if ('"' == val[0]) {
@@ -83,8 +99,8 @@ function parse(str, options: any = {}) {
  */
 
 function serialize(name, val, options: any = {}) {
-  var opt = options || {};
-  var enc = opt.encode || encode;
+  const opt = options || {};
+  const enc = opt.encode || encode;
 
   if (typeof enc !== 'function') {
     throw new TypeError('option encode is invalid');
@@ -94,16 +110,16 @@ function serialize(name, val, options: any = {}) {
     throw new TypeError('argument name is invalid');
   }
 
-  var value = enc(val);
+  const value = enc(val);
 
   if (value && !fieldContentRegExp.test(value)) {
     throw new TypeError('argument val is invalid');
   }
 
-  var str = name + '=' + value;
+  let str = name + '=' + value;
 
   if (null != opt.maxAge) {
-    var maxAge = opt.maxAge - 0;
+    const maxAge = opt.maxAge - 0;
     if (isNaN(maxAge)) throw new Error('maxAge should be a Number');
     str += '; Max-Age=' + Math.floor(maxAge);
   }
@@ -141,7 +157,7 @@ function serialize(name, val, options: any = {}) {
   }
 
   if (opt.sameSite) {
-    var sameSite =
+    const sameSite =
       typeof opt.sameSite === 'string'
         ? opt.sameSite.toLowerCase()
         : opt.sameSite;
@@ -167,22 +183,6 @@ function serialize(name, val, options: any = {}) {
   return str;
 }
 
-/**
- * Try decoding a string using a decoding function.
- *
- * @param {string} str
- * @param {function} decode
- * @private
- */
-
-function tryDecode(str, decode) {
-  try {
-    return decode(str);
-  } catch (e) {
-    return str;
-  }
-}
-
 const CookieStore = {
   /**
    * Get a cookie.
@@ -203,9 +203,13 @@ const CookieStore = {
    */
   set(name, value) {
     return new Promise(function (resolve, reject) {
-      const cookieString = serialize(name, value);
-      document.cookie = cookieString;
-      resolve();
+      try {
+        const cookieString = serialize(name, value);
+        document.cookie = cookieString;
+        resolve();
+      } catch (e) {
+        reject(e);
+      }
     });
   },
 
