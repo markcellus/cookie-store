@@ -1,5 +1,6 @@
 /**
  * Module variables.
+ * @private
  */
 
 var decode = decodeURIComponent;
@@ -26,9 +27,10 @@ var fieldContentRegExp = /^[\u0009\u0020-\u007e\u0080-\u00ff]+$/;
  * @param {string} str
  * @param {object} [options]
  * @return {object}
+ * @private
  */
 
-function parse(str, options) {
+function parse(str, options: any = {}) {
   if (typeof str !== 'string') {
     throw new TypeError('argument str must be a string');
   }
@@ -77,9 +79,10 @@ function parse(str, options) {
  * @param {string} val
  * @param {object} [options]
  * @return {string}
+ * @private
  */
 
-function serialize(name, val, options) {
+function serialize(name, val, options: any = {}) {
   var opt = options || {};
   var enc = opt.encode || encode;
 
@@ -169,6 +172,7 @@ function serialize(name, val, options) {
  *
  * @param {string} str
  * @param {function} decode
+ * @private
  */
 
 function tryDecode(str, decode) {
@@ -179,16 +183,46 @@ function tryDecode(str, decode) {
   }
 }
 
-function get() {}
+const CookieStore = {
+  /**
+   * Get a cookie.
+   *
+   * @param {string} name
+   * @return {Promise}
+   */
+  get(name) {
+    return Promise.resolve(parse(document.cookie)[name]);
+  },
 
-function set() {}
+  /**
+   * Set a cookie.
+   *
+   * @param {string} name
+   * @param {string} value
+   * @return {Promise}
+   */
+  set(name, value) {
+    return new Promise(function (resolve, reject) {
+      const cookieString = serialize(name, value);
+      document.cookie = cookieString;
+      resolve();
+    });
+  },
 
-function getAll() {}
+  /**
+   * Get multiple cookies.
+   *
+   * @return {Promise}
+   */
+  getAll() {
+    throw Error('getAll not implemented, coming soon though.');
+  },
+};
 
 if (!window.cookieStore) {
-  window.cookieStore = {
-    get: get,
-    set: set,
-    getAll: getAll,
-  };
+  window.cookieStore = CookieStore;
+}
+
+interface Window {
+  cookieStore: typeof CookieStore;
 }

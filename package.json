@@ -46,7 +46,7 @@
     "banner": "banner-cli index.js",
     "lint": "npm run lint:js && npm run lint:types",
     "lint:js": "eslint '**/*.{js,ts}'",
-    "lint:types": "tsc --noEmit",
+    "build": "tsc",
     "coveralls": "cat .coverage/lcov.info | coveralls"
   }
 }
