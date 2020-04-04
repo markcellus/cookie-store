@@ -1,6 +1,10 @@
 language: node_js
 node_js:
   - '10'
+script:
+  - npm test
+  - npm run build
+  - npm run banner
 after_script:
   - 'npm run coveralls'
 branches:
