@@ -12,6 +12,6 @@ module.exports = {
   },
   hooks: {
     'after:bump': 'npm run banner',
-    'before:init': ['npm test'],
+    'before:init': ['npm test && npm run build'],
   },
 };

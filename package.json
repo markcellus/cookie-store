@@ -1,7 +1,7 @@
 {
   "name": "cookie-store",
   "description": "A polyfill for the Cookie Store API",
-  "version": "1.0.3",
+  "version": "2.0.0",
   "author": "Mark Kennedy <mark@heyimmark.com>",
   "license": "MIT",
   "homepage": "https://github.com/mkay581/cookie-store",
