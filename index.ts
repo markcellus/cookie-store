@@ -26,13 +26,15 @@ const fieldContentRegExp = /^[\u0009\u0020-\u007e\u0080-\u00ff]+$/;
  * @private
  */
 
-function tryDecode(str, decode) {
+function tryDecode(str, decode): string {
   try {
     return decode(str);
   } catch (e) {
     return str;
   }
 }
+
+type ParsedCookies = Record<string, unknown>;
 
 /**
  * Parse a cookie header.
@@ -46,12 +48,12 @@ function tryDecode(str, decode) {
  * @private
  */
 
-function parse(str, options: any = {}) {
+function parse(str, options: any = {}): ParsedCookies {
   if (typeof str !== 'string') {
     throw new TypeError('argument str must be a string');
   }
 
-  const obj = {};
+  const obj: ParsedCookies = {};
   const opt = options || {};
   const pairs = str.split(pairSplitRegExp);
   const dec = opt.decode || decode;
@@ -98,7 +100,7 @@ function parse(str, options: any = {}) {
  * @private
  */
 
-function serialize(name, val, options: any = {}) {
+function serialize(name, val, options: any = {}): string {
   const opt = options || {};
   const enc = opt.encode || encode;
 
@@ -190,8 +192,8 @@ const CookieStore = {
    * @param {string} name
    * @return {Promise}
    */
-  get(name) {
-    return Promise.resolve(parse(document.cookie)[name]);
+  get(name): Promise<string> {
+    return Promise.resolve(parse(document.cookie)[name] as string);
   },
 
   /**
@@ -201,8 +203,8 @@ const CookieStore = {
    * @param {string} value
    * @return {Promise}
    */
-  set(name, value) {
-    return new Promise(function (resolve, reject) {
+  set(name, value): Promise<void> {
+    return new Promise((resolve, reject) => {
       try {
         const cookieString = serialize(name, value);
         document.cookie = cookieString;
@@ -218,7 +220,7 @@ const CookieStore = {
    *
    * @return {Promise}
    */
-  getAll() {
+  getAll(): Promise<void> {
     throw Error('getAll not implemented, coming soon though.');
   },
 };
