@@ -223,6 +223,17 @@ const CookieStore = {
   getAll(): Promise<void> {
     throw Error('getAll not implemented, coming soon though.');
   },
+
+  /**
+   * Remove a cookie.
+   *
+   * @return {Promise}
+   */
+  delete(name): Promise<void> {
+    return this.get(name).then((str) => {
+      document.cookie = document.cookie.replace(str, '');
+    });
+  },
 };
 
 if (!window.cookieStore) {
