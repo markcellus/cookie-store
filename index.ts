@@ -241,7 +241,7 @@ const CookieStore = {
    * @param {string} value
    * @return {Promise}
    */
-  set(name, value): Promise<void> {
+  set(name: string, value: string): Promise<void> {
     return new Promise((resolve, reject) => {
       try {
         const cookieString = serialize(name, value);
