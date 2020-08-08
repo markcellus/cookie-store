@@ -20,14 +20,24 @@
   "types": "index.d.ts",
   "repository": "mkay581/cookie-store",
   "devDependencies": {
+    "@babel/preset-env": "^7.11.0",
+    "@babel/preset-typescript": "^7.10.4",
+    "@open-wc/karma-esm": "^3.0.2",
+    "@types/chai": "^4.2.12",
+    "@types/mocha": "^8.0.1",
     "@typescript-eslint/eslint-plugin": "^2.26.0",
     "@typescript-eslint/parser": "^2.26.0",
     "banner-cli": "^0.14.1",
+    "chai": "^4.2.0",
     "eslint": "^6.8.0",
     "esm": "^3.2.25",
     "husky": "^4.2.3",
     "istanbul": "^0.4.5",
-    "mocha": "^8.0.1",
+    "karma": "^5.1.1",
+    "karma-chrome-launcher": "^3.1.0",
+    "karma-coverage": "^2.0.3",
+    "karma-mocha": "^2.0.1",
+    "mocha": "^8.1.1",
     "prettier": "^2.0.2",
     "pretty-quick": "^2.0.1",
     "typescript": "^3.8.3",
@@ -43,10 +53,12 @@
     "node": ">= 10.16"
   },
   "scripts": {
-    "test": "eslint '**/*.ts'",
+    "test": "npm run test:ts && eslint '**/*.ts'",
+    "test:ts": "karma start karma.conf.js  --single-run",
     "preversion": "npm test",
     "banner": "banner-cli index.js",
     "build": "tsc",
     "coveralls": "cat .coverage/lcov.info | coveralls"
-  }
+  },
+  "dependencies": {}
 }
