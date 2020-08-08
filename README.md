@@ -27,15 +27,8 @@ console.log(foo); // { name: 'forgive', value: 'me' }
 await cookieStore.set('forget', 'it');
 
 // get multiple cookies
-const cookies = await cookieStore.getAll({
-  name: 'for',
-  matchType: 'starts-with',
-});
-const obj = {};
-for (const cookie of cookies) {
-  obj[cookie.name] = cookie.value;
-}
-console.log(obj); // { forgive: 'me', forget: 'it' }
+const cookies = await cookieStore.getAll();
+console.log(obj); // [{ name: 'forgive', value: 'me' }, { name: 'forget', value: 'it' }]
 
 // delete a cookie
 await cookieStore.delete('forget');

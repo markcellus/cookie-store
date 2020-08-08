@@ -23,6 +23,28 @@ describe('Cookie Store', () => {
       expect(result).to.deep.equal({ name: foo, value: bar });
     });
   });
+  describe('getAll', () => {
+    it('returns an array with all cookies if no name is provided', async () => {
+      const foo = 'foo';
+      const bar = 'bar';
+      const baz = 'baz';
+      document.cookie = `${foo}=${bar}; ${bar}=${baz}`;
+      const result = await window.cookieStore.getAll();
+      expect(result).to.deep.equal([
+        { name: foo, value: bar },
+        { name: bar, value: baz },
+      ]);
+    });
+
+    it('returns an array with cookies that match name', async () => {
+      const foo = 'foo';
+      const bar = 'bar';
+      const baz = 'baz';
+      document.cookie = `${foo}=${bar}; ${bar}=${baz}`;
+      const result = await window.cookieStore.getAll(bar);
+      expect(result).to.deep.equal([{ name: bar, value: baz }]);
+    });
+  });
   describe('set', () => {
     it('updates document.cookie with supplied value', async () => {
       await window.cookieStore.set('foo', 'bar');

@@ -37,6 +37,7 @@ function tryDecode(
 }
 
 type CookieSameSite = 'no_restriction' | 'lax' | 'strict';
+type CookieMatchType = 'equals';
 
 interface Cookie {
   domain?: string;
@@ -54,7 +55,11 @@ interface CookieStoreDeleteOptions {
   path: '/';
 }
 
-type ParsedCookies = Record<string, Cookie>;
+interface CookieStoreGetOptions {
+  name?: string;
+  url?: string;
+  matchType?: CookieMatchType;
+}
 
 interface ParseOptions {
   decode?: boolean;
@@ -83,12 +88,12 @@ interface SerializeOptions {
  * @private
  */
 
-function parse(str, options: ParseOptions = {}): ParsedCookies {
+function parse(str, options: ParseOptions = {}): Cookie[] {
   if (typeof str !== 'string') {
     throw new TypeError('argument str must be a string');
   }
 
-  const obj: ParsedCookies = {};
+  const obj = [];
   const opt = options || {};
   const pairs = str.split(pairSplitRegExp);
   const dec = opt.decode || decode;
@@ -112,10 +117,10 @@ function parse(str, options: ParseOptions = {}): ParsedCookies {
 
     // only assign once
     if (undefined == obj[key]) {
-      obj[key] = {
+      obj.push({
         name: key,
         value: tryDecode(val, dec),
-      };
+      });
     }
   }
 
@@ -230,8 +235,8 @@ const CookieStore = {
    * @param {string} name
    * @return {Promise}
    */
-  get(name): Promise<Cookie> {
-    return Promise.resolve(parse(document.cookie)[name]);
+  async get(name): Promise<Cookie> {
+    return parse(document.cookie).find((cookie) => cookie.name === name);
   },
 
   /**
@@ -255,11 +260,13 @@ const CookieStore = {
 
   /**
    * Get multiple cookies.
-   *
-   * @return {Promise}
    */
-  getAll(): Promise<void> {
-    throw Error('getAll not implemented, coming soon though.');
+  async getAll(name?: CookieStoreGetOptions['name']): Promise<Cookie[]> {
+    if (name) {
+      const cookie = await this.get(name);
+      return [cookie];
+    }
+    return parse(document.cookie);
   },
 
   /**
