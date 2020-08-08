@@ -21,7 +21,7 @@ import 'cookie-store';
 await cookieStore.set('forgive', 'me');
 // get a cookie
 const foo = await cookieStore.get('forgive');
-console.log(foo); // 'me'
+console.log(foo); // { name: 'forgive', value: 'me' }
 
 // set another cookie
 await cookieStore.set('forget', 'it');
