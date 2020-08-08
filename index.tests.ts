@@ -55,7 +55,7 @@ describe('Cookie Store', () => {
     it('sets max age to 0 on cookie that matches supplied name', async () => {
       document.cookie = 'foo=bar';
       await window.cookieStore.delete('foo');
-      expect(document.cookie).to.equal('foo=bar; Max-Age=0; Path=/');
+      expect(document.cookie).to.equal('foo=bar; Max-Age=0');
     });
   });
 });

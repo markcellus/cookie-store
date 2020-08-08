@@ -51,8 +51,8 @@ interface Cookie {
 
 interface CookieStoreDeleteOptions {
   name: string;
-  domain: null;
-  path: '/';
+  domain?: string;
+  path?: string;
 }
 
 interface CookieStoreGetOptions {
@@ -228,6 +228,18 @@ function serialize(name, val, options: SerializeOptions = {}): string {
   return str;
 }
 
+function sanitizeOptions(
+  arg: unknown
+): CookieStoreGetOptions | CookieStoreDeleteOptions {
+  if (!arg) {
+    return {};
+  }
+  if (typeof arg === 'string') {
+    return { name: arg };
+  }
+  return arg;
+}
+
 const CookieStore = {
   /**
    * Get a cookie.
@@ -235,7 +247,10 @@ const CookieStore = {
    * @param {string} name
    * @return {Promise}
    */
-  async get(name): Promise<Cookie> {
+  async get(
+    options?: CookieStoreGetOptions['name'] | CookieStoreGetOptions
+  ): Promise<Cookie> {
+    const { name } = sanitizeOptions(options);
     return parse(document.cookie).find((cookie) => cookie.name === name);
   },
 
@@ -261,7 +276,10 @@ const CookieStore = {
   /**
    * Get multiple cookies.
    */
-  async getAll(name?: CookieStoreGetOptions['name']): Promise<Cookie[]> {
+  async getAll(
+    options?: CookieStoreGetOptions['name'] | CookieStoreGetOptions
+  ): Promise<Cookie[]> {
+    const { name } = sanitizeOptions(options);
     if (name) {
       const cookie = await this.get(name);
       return [cookie];
@@ -275,12 +293,16 @@ const CookieStore = {
    * @param {String} name
    * @return {Promise}
    */
-  async delete(name: CookieStoreDeleteOptions['name']): Promise<void> {
+  async delete(
+    options: CookieStoreDeleteOptions['name'] | CookieStoreDeleteOptions
+  ): Promise<void> {
+    const { name, domain } = sanitizeOptions(
+      options
+    ) as CookieStoreDeleteOptions;
     const { value } = await this.get(name);
     const serializedValue = serialize(name, value, {
       maxAge: 0,
-      domain: null,
-      path: '/',
+      domain,
     });
     document.cookie = serializedValue;
     return Promise.resolve();
