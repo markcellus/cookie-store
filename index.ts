@@ -25,7 +25,6 @@ const fieldContentRegExp = /^[\u0009\u0020-\u007e\u0080-\u00ff]+$/;
  * @param {function} decode
  * @private
  */
-
 function tryDecode(
   str: string,
   decode: ((encodedURIComponent: string) => string) | boolean
@@ -37,7 +36,25 @@ function tryDecode(
   }
 }
 
-type ParsedCookies = Record<string, unknown>;
+type CookieSameSite = 'no_restriction' | 'lax' | 'strict';
+
+interface Cookie {
+  domain?: string;
+  expires?: number;
+  name: string;
+  path?: string;
+  secure?: boolean;
+  sameSite?: CookieSameSite;
+  value: string;
+}
+
+interface CookieStoreDeleteOptions {
+  name: string;
+  domain: null;
+  path: '/';
+}
+
+type ParsedCookies = Record<string, Cookie>;
 
 interface ParseOptions {
   decode?: boolean;
@@ -95,7 +112,10 @@ function parse(str, options: ParseOptions = {}): ParsedCookies {
 
     // only assign once
     if (undefined == obj[key]) {
-      obj[key] = tryDecode(val, dec);
+      obj[key] = {
+        name: key,
+        value: tryDecode(val, dec),
+      };
     }
   }
 
@@ -210,8 +230,8 @@ const CookieStore = {
    * @param {string} name
    * @return {Promise}
    */
-  get(name): Promise<string> {
-    return Promise.resolve(parse(document.cookie)[name] as string);
+  get(name): Promise<Cookie> {
+    return Promise.resolve(parse(document.cookie)[name]);
   },
 
   /**
@@ -245,12 +265,18 @@ const CookieStore = {
   /**
    * Remove a cookie.
    *
+   * @param {String} name
    * @return {Promise}
    */
-  delete(name): Promise<void> {
-    return this.get(name).then((str) => {
-      document.cookie = document.cookie.replace(str, '');
+  async delete(name: CookieStoreDeleteOptions['name']): Promise<void> {
+    const { value } = await this.get(name);
+    const serializedValue = serialize(name, value, {
+      maxAge: 0,
+      domain: null,
+      path: '/',
     });
+    document.cookie = serializedValue;
+    return Promise.resolve();
   },
 };
 
