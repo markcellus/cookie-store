@@ -37,6 +37,7 @@ function tryDecode(
 }
 
 type CookieSameSite = 'no_restriction' | 'lax' | 'strict';
+type CookieMatchType = 'equals';
 
 interface Cookie {
   domain?: string;
@@ -50,11 +51,15 @@ interface Cookie {
 
 interface CookieStoreDeleteOptions {
   name: string;
-  domain: null;
-  path: '/';
+  domain?: string;
+  path?: string;
 }
 
-type ParsedCookies = Record<string, Cookie>;
+interface CookieStoreGetOptions {
+  name?: string;
+  url?: string;
+  matchType?: CookieMatchType;
+}
 
 interface ParseOptions {
   decode?: boolean;
@@ -83,12 +88,12 @@ interface SerializeOptions {
  * @private
  */
 
-function parse(str, options: ParseOptions = {}): ParsedCookies {
+function parse(str, options: ParseOptions = {}): Cookie[] {
   if (typeof str !== 'string') {
     throw new TypeError('argument str must be a string');
   }
 
-  const obj: ParsedCookies = {};
+  const obj = [];
   const opt = options || {};
   const pairs = str.split(pairSplitRegExp);
   const dec = opt.decode || decode;
@@ -112,10 +117,10 @@ function parse(str, options: ParseOptions = {}): ParsedCookies {
 
     // only assign once
     if (undefined == obj[key]) {
-      obj[key] = {
+      obj.push({
         name: key,
         value: tryDecode(val, dec),
-      };
+      });
     }
   }
 
@@ -223,6 +228,18 @@ function serialize(name, val, options: SerializeOptions = {}): string {
   return str;
 }
 
+function sanitizeOptions(
+  arg: unknown
+): CookieStoreGetOptions | CookieStoreDeleteOptions {
+  if (!arg) {
+    return {};
+  }
+  if (typeof arg === 'string') {
+    return { name: arg };
+  }
+  return arg;
+}
+
 const CookieStore = {
   /**
    * Get a cookie.
@@ -230,8 +247,11 @@ const CookieStore = {
    * @param {string} name
    * @return {Promise}
    */
-  get(name): Promise<Cookie> {
-    return Promise.resolve(parse(document.cookie)[name]);
+  async get(
+    options?: CookieStoreGetOptions['name'] | CookieStoreGetOptions
+  ): Promise<Cookie> {
+    const { name } = sanitizeOptions(options);
+    return parse(document.cookie).find((cookie) => cookie.name === name);
   },
 
   /**
@@ -255,11 +275,16 @@ const CookieStore = {
 
   /**
    * Get multiple cookies.
-   *
-   * @return {Promise}
    */
-  getAll(): Promise<void> {
-    throw Error('getAll not implemented, coming soon though.');
+  async getAll(
+    options?: CookieStoreGetOptions['name'] | CookieStoreGetOptions
+  ): Promise<Cookie[]> {
+    const { name } = sanitizeOptions(options);
+    if (name) {
+      const cookie = await this.get(name);
+      return [cookie];
+    }
+    return parse(document.cookie);
   },
 
   /**
@@ -268,12 +293,16 @@ const CookieStore = {
    * @param {String} name
    * @return {Promise}
    */
-  async delete(name: CookieStoreDeleteOptions['name']): Promise<void> {
+  async delete(
+    options: CookieStoreDeleteOptions['name'] | CookieStoreDeleteOptions
+  ): Promise<void> {
+    const { name, domain } = sanitizeOptions(
+      options
+    ) as CookieStoreDeleteOptions;
     const { value } = await this.get(name);
     const serializedValue = serialize(name, value, {
       maxAge: 0,
-      domain: null,
-      path: '/',
+      domain,
     });
     document.cookie = serializedValue;
     return Promise.resolve();
