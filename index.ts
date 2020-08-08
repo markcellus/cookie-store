@@ -26,15 +26,33 @@ const fieldContentRegExp = /^[\u0009\u0020-\u007e\u0080-\u00ff]+$/;
  * @private
  */
 
-function tryDecode(str, decode): string {
+function tryDecode(
+  str: string,
+  decode: ((encodedURIComponent: string) => string) | boolean
+): string {
   try {
-    return decode(str);
+    return typeof decode === 'boolean' ? decodeURIComponent(str) : decode(str);
   } catch (e) {
     return str;
   }
 }
 
 type ParsedCookies = Record<string, unknown>;
+
+interface ParseOptions {
+  decode?: boolean;
+}
+
+interface SerializeOptions {
+  encode?: boolean;
+  maxAge?: number;
+  domain?: string;
+  path?: string;
+  expires?: Date;
+  httpOnly?: boolean;
+  secure?: boolean;
+  sameSite?: boolean | string;
+}
 
 /**
  * Parse a cookie header.
@@ -48,7 +66,7 @@ type ParsedCookies = Record<string, unknown>;
  * @private
  */
 
-function parse(str, options: any = {}): ParsedCookies {
+function parse(str, options: ParseOptions = {}): ParsedCookies {
   if (typeof str !== 'string') {
     throw new TypeError('argument str must be a string');
   }
@@ -100,7 +118,7 @@ function parse(str, options: any = {}): ParsedCookies {
  * @private
  */
 
-function serialize(name, val, options: any = {}): string {
+function serialize(name, val, options: SerializeOptions = {}): string {
   const opt = options || {};
   const enc = opt.encode || encode;
 
