@@ -9,5 +9,5 @@
     "declaration": true,
     "lib": ["ES5", "dom", "ES2015"]
   },
-  "files": ["index.ts"]
+  "files": ["index.ts", "index.tests.ts"]
 }
