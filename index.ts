@@ -249,7 +249,7 @@ const CookieStore = {
    */
   async get(
     options?: CookieStoreGetOptions['name'] | CookieStoreGetOptions
-  ): Promise<Cookie> {
+  ): Promise<Cookie | undefined> {
     const { name } = sanitizeOptions(options);
     return parse(document.cookie).find((cookie) => cookie.name === name);
   },
@@ -282,7 +282,7 @@ const CookieStore = {
     const { name } = sanitizeOptions(options);
     if (name) {
       const cookie = await this.get(name);
-      return [cookie];
+      return cookie ? [cookie] : [];
     }
     return parse(document.cookie);
   },
