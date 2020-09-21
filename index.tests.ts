@@ -48,7 +48,12 @@ describe('Cookie Store', () => {
   describe('set', () => {
     it('updates document.cookie with supplied value', async () => {
       await window.cookieStore.set('foo', 'bar');
-      expect(document.cookie).to.equal('foo=bar');
+      expect(document.cookie).to.equal('foo=bar; Path=/; SameSite=Strict');
+    });
+    it('updates document.cookie based on supplied opts', async () => {
+      const expires = new Date()
+      await window.cookieStore.set({name: 'foo', value: 'bar', expires: +expires});
+      expect(document.cookie).to.equal(`foo=bar; Path=/; Expires=${expires.toUTCString()}; SameSite=Strict`);
     });
   });
   describe('delete', () => {

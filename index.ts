@@ -61,6 +61,15 @@ interface CookieStoreGetOptions {
   matchType?: CookieMatchType;
 }
 
+interface CookieInit {
+  name: string;
+  value: string;
+  expires?: number;
+  domain?: string;
+  path?: string;
+  sameSite?: CookieSameSite;
+}
+
 interface ParseOptions {
   decode?: boolean;
 }
@@ -70,7 +79,7 @@ interface SerializeOptions {
   maxAge?: number;
   domain?: string;
   path?: string;
-  expires?: Date;
+  expires?: Date | number;
   httpOnly?: boolean;
   secure?: boolean;
   sameSite?: boolean | string;
@@ -186,13 +195,16 @@ function serialize(name, val, options: SerializeOptions = {}): string {
   }
 
   if (opt.expires) {
-    if (typeof opt.expires.toUTCString !== 'function') {
+    let expires = opt.expires
+    if (typeof opt.expires === "number") {
+      expires = new Date(expires)
+    }
+    if (!(expires instanceof Date)) {
       throw new TypeError('option expires is invalid');
     }
-
-    str += '; Expires=' + opt.expires.toUTCString();
+    str += '; Expires=' + expires.toUTCString();
   }
-
+  
   if (opt.httpOnly) {
     str += '; HttpOnly';
   }
@@ -261,16 +273,13 @@ const CookieStore = {
    * @param {string} value
    * @return {Promise}
    */
-  set(name: string, value: string): Promise<void> {
-    return new Promise((resolve, reject) => {
-      try {
-        const cookieString = serialize(name, value);
-        document.cookie = cookieString;
-        resolve();
-      } catch (e) {
-        reject(e);
-      }
-    });
+  async set(opts: CookieInit | string, value?: string): Promise<void> {
+    const defaults = {path: '/', sameSite: 'strict'}
+    if (typeof opts === 'string') {
+      document.cookie = serialize(opts, value, defaults)
+    } else {
+      document.cookie = serialize(opts.name, opts.value, Object.assign(defaults, opts));
+    }
   },
 
   /**
