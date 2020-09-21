@@ -22,6 +22,14 @@ describe('Cookie Store', () => {
       const result = await window.cookieStore.get(foo);
       expect(result).to.deep.equal({ name: foo, value: bar });
     });
+    
+    it('returns undefined when no cookie is found', async () => {
+      const foo = 'foo';
+      const bar = 'bar';
+      document.cookie = `${foo}=${bar}`;
+      const result = await window.cookieStore.get(bar);
+      expect(result).to.deep.equal(undefined);
+    });
   });
   describe('getAll', () => {
     it('returns an array with all cookies if no name is provided', async () => {
@@ -43,6 +51,15 @@ describe('Cookie Store', () => {
       document.cookie = `${foo}=${bar}; ${bar}=${baz}`;
       const result = await window.cookieStore.getAll(bar);
       expect(result).to.deep.equal([{ name: bar, value: baz }]);
+    });
+    
+    it('returns an empty when no matching cookies are found', async () => {
+      const foo = 'foo';
+      const bar = 'bar';
+      const baz = 'baz';
+      document.cookie = `${foo}=${bar}; ${bar}=${baz}`;
+      const result = await window.cookieStore.getAll(baz);
+      expect(result).to.deep.equal([]);
     });
   });
   describe('set', () => {
