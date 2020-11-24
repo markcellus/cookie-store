@@ -53,8 +53,9 @@
     "node": ">= 10.16"
   },
   "scripts": {
-    "test": "npm run test:ts && eslint '**/*.ts'",
+    "test": "npm run test:ts && eslint '**/*.ts' && npm run prettier",
     "test:ts": "karma start karma.conf.js  --single-run",
+    "prettier": "prettier --check '**/*'",
     "preversion": "npm test",
     "banner": "banner-cli index.js",
     "build": "tsc",
