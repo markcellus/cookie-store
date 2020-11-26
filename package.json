@@ -55,9 +55,9 @@
   },
   "scripts": {
     "pretest": "npm run build",
-    "test": "npm run test:ts && eslint '**/*.ts' && npm run prettier",
+    "test": "npm run test:ts && eslint '**/*.{ts,js}' && npm run prettier",
     "test:ts": "karma start karma.conf.cjs  --single-run",
-    "prettier": "prettier --check '**/*'",
+    "prettier": "prettier --check '**/*.{ts,js}'",
     "preversion": "npm test",
     "banner": "banner-cli index.js",
     "build": "tsc",
