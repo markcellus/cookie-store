@@ -54,6 +54,7 @@
     "node": ">= 14"
   },
   "scripts": {
+    "pretest": "npm run build",
     "test": "npm run test:ts && eslint '**/*.ts' && npm run prettier",
     "test:ts": "karma start karma.conf.cjs  --single-run",
     "prettier": "prettier --check '**/*'",
