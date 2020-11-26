@@ -50,7 +50,7 @@
     "index.d.ts"
   ],
   "engines": {
-    "node": ">= 10.16"
+    "node": ">= 14"
   },
   "scripts": {
     "test": "npm run test:ts && eslint '**/*.ts' && npm run prettier",
