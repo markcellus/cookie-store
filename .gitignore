@@ -2,6 +2,5 @@ coverage/
 node_modules/
 npm-debug.log
 index.js
-index.tests.js
 index.d.ts
 index.tests.d.ts
