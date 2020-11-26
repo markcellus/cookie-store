@@ -14,7 +14,7 @@ module.exports = function (config) {
       reporters: [{ type: 'lcov', subdir: '.' }, { type: 'text-summary' }],
     },
     reporters: ['progress', 'coverage'],
-    frameworks: ['esm', 'mocha'],
+    frameworks: ['esm', 'mocha', 'chai'],
     port: 9876,
     colors: true,
     logLevel: config.LOG_INFO,

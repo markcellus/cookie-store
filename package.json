@@ -34,6 +34,7 @@
     "husky": "^4.2.3",
     "istanbul": "^0.4.5",
     "karma": "^5.1.1",
+    "karma-chai": "^0.1.0",
     "karma-chrome-launcher": "^3.1.0",
     "karma-coverage": "^2.0.3",
     "karma-mocha": "^2.0.1",
