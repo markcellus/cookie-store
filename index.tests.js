@@ -1,3 +1,5 @@
+/* global expect */
+
 describe('Cookie Store', () => {
   beforeEach(() => {
     Object.defineProperty(document, 'cookie', {

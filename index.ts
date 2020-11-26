@@ -116,6 +116,7 @@ function parse(str: string, options: ParseOptions = {}): Cookie[] {
     }
 
     // only assign once
+    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
     // @ts-ignore
     if (undefined == obj[key]) {
       obj.push({
@@ -304,6 +305,7 @@ const CookieStore = {
     const { name, domain } = sanitizeOptions(
       options
     ) as CookieStoreDeleteOptions;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const { value } = (await this.get(name))!;
     const serializedValue = serialize(name, value, {
       maxAge: 0,
