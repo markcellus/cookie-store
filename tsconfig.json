@@ -8,6 +8,10 @@
     "esModuleInterop": true,
     "declaration": true,
     "lib": ["ES2020", "dom"],
-    "moduleResolution": "node"
-  }
+    "moduleResolution": "node",
+    "outDir": "dist"
+  },
+  "files": [
+    "src/index.ts"
+  ]
 }

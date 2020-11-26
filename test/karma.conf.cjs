@@ -1,8 +1,8 @@
 module.exports = function (config) {
   config.set({
     files: [
-      { pattern: 'index.js', type: 'module' },
-      { pattern: '**/*.tests.js', type: 'module' }
+      { pattern: '../dist/index.js', type: 'module' },
+      { pattern: './*.tests.js', type: 'module' }
     ],
     plugins: ['karma-*'],
     coverageReporter: {
