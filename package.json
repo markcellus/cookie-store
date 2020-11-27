@@ -43,10 +43,7 @@
     "typescript-temporary-fork-for-jsdoc": "^3.6.0-insiders.20190802"
   },
   "files": [
-    "LICENSE",
-    "README.md",
-    "index.js",
-    "index.d.ts"
+    "dist"
   ],
   "engines": {
     "node": ">= 14"
