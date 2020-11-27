@@ -5,11 +5,7 @@ module.exports = function (config) {
       { pattern: './*.tests.js', type: 'module' }
     ],
     plugins: ['karma-*'],
-    coverageReporter: {
-      includeAllSources: true,
-      reporters: [{ type: 'lcov', subdir: '.' }, { type: 'text-summary' }],
-    },
-    reporters: ['progress', 'coverage'],
+    reporters: ['progress'],
     frameworks: ['mocha', 'chai'],
     port: 9876,
     colors: true,
