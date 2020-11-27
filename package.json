@@ -20,8 +20,6 @@
   "types": "index.d.ts",
   "repository": "markcellus/cookie-store",
   "devDependencies": {
-    "@babel/preset-env": "^7.11.0",
-    "@babel/preset-typescript": "^7.10.4",
     "@open-wc/karma-esm": "^3.0.2",
     "@types/chai": "^4.2.12",
     "@types/mocha": "^8.0.1",
@@ -34,6 +32,7 @@
     "husky": "^4.2.3",
     "istanbul": "^0.4.5",
     "karma": "^5.1.1",
+    "karma-chai": "^0.1.0",
     "karma-chrome-launcher": "^3.1.0",
     "karma-coverage": "^2.0.3",
     "karma-mocha": "^2.0.1",
@@ -44,20 +43,18 @@
     "typescript-temporary-fork-for-jsdoc": "^3.6.0-insiders.20190802"
   },
   "files": [
-    "LICENSE",
-    "README.md",
-    "index.js",
-    "index.d.ts"
+    "dist"
   ],
   "engines": {
-    "node": ">= 10.16"
+    "node": ">= 14"
   },
   "scripts": {
-    "test": "npm run test:ts && eslint '**/*.ts' && npm run prettier",
-    "test:ts": "karma start karma.conf.js  --single-run",
-    "prettier": "prettier --check '**/*'",
+    "pretest": "npm run build",
+    "test": "npm run test:ts && eslint 'src/**/*' && npm run prettier",
+    "test:ts": "karma start test/karma.conf.cjs  --single-run",
+    "prettier": "prettier --check 'src/**/*'",
     "preversion": "npm test",
-    "banner": "banner-cli index.js",
+    "banner": "banner-cli dist/index.js",
     "build": "tsc",
     "coveralls": "cat .coverage/lcov.info | coveralls"
   },

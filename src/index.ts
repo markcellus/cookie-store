@@ -88,7 +88,7 @@ interface SerializeOptions {
  * @private
  */
 
-function parse(str, options: ParseOptions = {}): Cookie[] {
+function parse(str: string, options: ParseOptions = {}): Cookie[] {
   if (typeof str !== 'string') {
     throw new TypeError('argument str must be a string');
   }
@@ -116,6 +116,8 @@ function parse(str, options: ParseOptions = {}): Cookie[] {
     }
 
     // only assign once
+    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // @ts-ignore
     if (undefined == obj[key]) {
       obj.push({
         name: key,
@@ -143,7 +145,11 @@ function parse(str, options: ParseOptions = {}): Cookie[] {
  * @private
  */
 
-function serialize(name, val, options: SerializeOptions = {}): string {
+function serialize(
+  name: string,
+  val: string,
+  options: SerializeOptions = {}
+): string {
   const opt = options || {};
   const enc = opt.encode || encode;
 
@@ -229,7 +235,7 @@ function serialize(name, val, options: SerializeOptions = {}): string {
 }
 
 function sanitizeOptions(
-  arg: unknown
+  arg: string | CookieStoreGetOptions | undefined
 ): CookieStoreGetOptions | CookieStoreDeleteOptions {
   if (!arg) {
     return {};
@@ -299,7 +305,8 @@ const CookieStore = {
     const { name, domain } = sanitizeOptions(
       options
     ) as CookieStoreDeleteOptions;
-    const { value } = await this.get(name);
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const { value } = (await this.get(name))!;
     const serializedValue = serialize(name, value, {
       maxAge: 0,
       domain,
