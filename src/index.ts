@@ -254,7 +254,13 @@ const CookieStore = {
     if (!options || !Object.keys(options).length) {
       throw new TypeError('CookieStoreGetOptions must not be empty');
     }
-    const { name } = sanitizeOptions<CookieStoreGetOptions>(options);
+    const { name, url } = sanitizeOptions<CookieStoreGetOptions>(options);
+    if (url) {
+      if (url !== window.location.pathname && url !== window.location.href) {
+        throw new TypeError('URL must match the document URL');
+      }
+      return parse(document.cookie)[0];
+    }
     return parse(document.cookie).find((cookie) => cookie.name === name);
   },
 
