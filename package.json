@@ -55,8 +55,7 @@
     "prettier": "prettier --check 'src/**/*'",
     "preversion": "npm test",
     "banner": "banner-cli dist/index.js",
-    "build": "tsc",
-    "coveralls": "cat .coverage/lcov.info | coveralls"
+    "build": "tsc"
   },
   "dependencies": {}
 }
