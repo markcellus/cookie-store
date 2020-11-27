@@ -256,6 +256,9 @@ const CookieStore = {
   async get(
     options?: CookieStoreGetOptions['name'] | CookieStoreGetOptions
   ): Promise<Cookie | undefined> {
+    if (!options || !Object.keys(options).length) {
+      throw new TypeError('CookieStoreGetOptions must not be empty');
+    }
     const { name } = sanitizeOptions(options);
     return parse(document.cookie).find((cookie) => cookie.name === name);
   },
