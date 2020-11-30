@@ -234,14 +234,9 @@ function serialize(
   return str;
 }
 
-function sanitizeOptions(
-  arg: string | CookieStoreGetOptions | undefined
-): CookieStoreGetOptions | CookieStoreDeleteOptions {
-  if (!arg) {
-    return {};
-  }
+function sanitizeOptions<T>(arg: string | T): T {
   if (typeof arg === 'string') {
-    return { name: arg };
+    return ({ name: arg } as unknown) as T;
   }
   return arg;
 }
@@ -256,7 +251,20 @@ const CookieStore = {
   async get(
     options?: CookieStoreGetOptions['name'] | CookieStoreGetOptions
   ): Promise<Cookie | undefined> {
-    const { name } = sanitizeOptions(options);
+    if (!options || !Object.keys(options).length) {
+      throw new TypeError('CookieStoreGetOptions must not be empty');
+    }
+    const { name, url } = sanitizeOptions<CookieStoreGetOptions>(options);
+    if (url) {
+      const parsedURL = new URL(url, window.location.origin);
+      if (
+        window.location.href !== parsedURL.href ||
+        window.location.origin !== parsedURL.origin
+      ) {
+        throw new TypeError('URL must match the document URL');
+      }
+      return parse(document.cookie)[0];
+    }
     return parse(document.cookie).find((cookie) => cookie.name === name);
   },
 
@@ -285,12 +293,12 @@ const CookieStore = {
   async getAll(
     options?: CookieStoreGetOptions['name'] | CookieStoreGetOptions
   ): Promise<Cookie[]> {
-    const { name } = sanitizeOptions(options);
-    if (name) {
-      const cookie = await this.get(name);
-      return cookie ? [cookie] : [];
+    if (!options) {
+      return parse(document.cookie);
     }
-    return parse(document.cookie);
+    const { name } = sanitizeOptions<CookieStoreGetOptions>(options);
+    const cookie = await this.get(name);
+    return cookie ? [cookie] : [];
   },
 
   /**
@@ -302,9 +310,7 @@ const CookieStore = {
   async delete(
     options: CookieStoreDeleteOptions['name'] | CookieStoreDeleteOptions
   ): Promise<void> {
-    const { name, domain } = sanitizeOptions(
-      options
-    ) as CookieStoreDeleteOptions;
+    const { name, domain } = sanitizeOptions<CookieStoreDeleteOptions>(options);
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const { value } = (await this.get(name))!;
     const serializedValue = serialize(name, value, {
