@@ -116,7 +116,7 @@ function parse(str: string, options: ParseOptions = {}): Cookie[] {
     }
 
     // only assign once
-    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     if (undefined == obj[key]) {
       obj.push({
@@ -320,6 +320,10 @@ if (!window.cookieStore) {
   window.cookieStore = CookieStore;
 }
 
-interface Window {
-  cookieStore: typeof CookieStore;
+declare global {
+  interface Window {
+    cookieStore: typeof CookieStore;
+  }
 }
+
+export {};
