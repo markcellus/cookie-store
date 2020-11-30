@@ -256,7 +256,11 @@ const CookieStore = {
     }
     const { name, url } = sanitizeOptions<CookieStoreGetOptions>(options);
     if (url) {
-      if (url !== window.location.pathname && url !== window.location.href) {
+      const parsedURL = new URL(url, window.location.origin);
+      if (
+        window.location.href !== parsedURL.href ||
+        window.location.origin !== parsedURL.origin
+      ) {
         throw new TypeError('URL must match the document URL');
       }
       return parse(document.cookie)[0];
