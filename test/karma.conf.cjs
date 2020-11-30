@@ -1,8 +1,14 @@
 module.exports = function (config) {
   config.set({
     files: [
+      // Include the compiled library
       { pattern: '../dist/index.js', type: 'module' },
-      { pattern: './*.tests.js', type: 'module' }
+      // Set up test environment to be able to run WPT tests
+      { pattern: './wpt-setup/*.js', type: 'module' },
+      // Our tests
+      { pattern: './index.tests.js', type: 'module' },
+      // Web Platform Tests
+      { pattern: './wpt/*.js', type: 'module' }
     ],
     plugins: ['karma-*'],
     reporters: ['progress'],
