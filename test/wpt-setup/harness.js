@@ -30,4 +30,4 @@ window.promise_rejects_js = async (testCase, expectedError, promise) => {
   assert.fail(`${testCase.name}: Promise didn't reject when it should have.`);
 };
 
-window.assert_equals = (one, two) => assert.equal(one, two);
+window.assert_equals = assert.equal;
