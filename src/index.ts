@@ -275,23 +275,44 @@ const CookieStore = {
     return parse(document.cookie).find((cookie) => cookie.name === name);
   },
 
-  /**
-   * Set a cookie.
-   *
-   * @param {string} name
-   * @param {string} value
-   * @return {Promise}
-   */
-  set(name: string, value: string): Promise<void> {
-    return new Promise((resolve, reject) => {
-      try {
-        const cookieString = serialize(name, value);
-        document.cookie = cookieString;
-        resolve();
-      } catch (e) {
-        reject(e);
+  set(options: CookieInit | string, value?: string): Promise<void> {
+    if (typeof options === 'string') {
+      return new Promise((resolve, reject) => {
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          const cookieString = serialize(options as string, value!);
+          document.cookie = cookieString;
+          resolve();
+        } catch (e) {
+          reject(e);
+        }
+      });
+    } else {
+      if (options.domain?.startsWith('.')) {
+        return Promise.reject(
+          new TypeError('Cookie domain cannot start with "."')
+        );
+      } else if (
+        options.domain &&
+        options.domain !== window.location.hostname
+      ) {
+        return Promise.reject(
+          new TypeError('Cookie domain must domain-match current host')
+        );
       }
-    });
+      if (!options.path) options.path = '/';
+      if (!options.sameSite) options.sameSite = 'strict';
+      const { name, value } = sanitizeOptions<CookieInit>(options);
+      return new Promise((resolve, reject) => {
+        try {
+          const cookieString = serialize(name, value, options);
+          document.cookie = cookieString;
+          resolve();
+        } catch (e) {
+          reject(e);
+        }
+      });
+    }
   },
 
   /**
