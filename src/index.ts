@@ -296,8 +296,7 @@ const CookieStore = {
     if (!options || Object.keys(options).length === 0) {
       return parse(document.cookie);
     }
-    const { name } = sanitizeOptions<CookieStoreGetOptions>(options);
-    const cookie = await this.get(name);
+    const cookie = await this.get(options);
     return cookie ? [cookie] : [];
   },
 
