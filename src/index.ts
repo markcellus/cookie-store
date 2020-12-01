@@ -76,6 +76,15 @@ interface SerializeOptions {
   sameSite?: boolean | string;
 }
 
+interface CookieInit {
+  name: string;
+  value: string;
+  expires?: Date;
+  domain?: string;
+  path: string;
+  sameSite: CookieSameSite;
+}
+
 /**
  * Parse a cookie header.
  *
