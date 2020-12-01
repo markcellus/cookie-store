@@ -293,7 +293,7 @@ const CookieStore = {
   async getAll(
     options?: CookieStoreGetOptions['name'] | CookieStoreGetOptions
   ): Promise<Cookie[]> {
-    if (!options) {
+    if (!options || Object.keys(options).length === 0) {
       return parse(document.cookie);
     }
     const { name } = sanitizeOptions<CookieStoreGetOptions>(options);
