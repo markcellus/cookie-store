@@ -256,7 +256,9 @@ const CookieStore = {
   async get(
     options?: CookieStoreGetOptions['name'] | CookieStoreGetOptions
   ): Promise<Cookie | undefined> {
-    if (!options || !Object.keys(options).length) {
+    if (options == null) {
+      throw new TypeError('CookieStoreGetOptions must not be empty');
+    } else if (options instanceof Object && !Object.keys(options).length) {
       throw new TypeError('CookieStoreGetOptions must not be empty');
     }
     const { name, url } = sanitizeOptions<CookieStoreGetOptions>(options);
