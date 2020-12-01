@@ -316,14 +316,34 @@ const CookieStore = {
   async delete(
     options: CookieStoreDeleteOptions['name'] | CookieStoreDeleteOptions
   ): Promise<void> {
-    const { name, domain } = sanitizeOptions<CookieStoreDeleteOptions>(options);
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const { value } = (await this.get(name))!;
-    const serializedValue = serialize(name, value, {
-      maxAge: 0,
-      domain,
-    });
-    document.cookie = serializedValue;
+    const parsedOptions = sanitizeOptions<CookieStoreDeleteOptions>(options);
+
+    let { path } = parsedOptions;
+    const { name, domain } = parsedOptions;
+
+    if (path === '') {
+      path = '/';
+    }
+
+    if (path != null && !path.startsWith('/')) {
+      return Promise.reject(new TypeError('Cookie path must start with "/"'));
+    }
+
+    if (domain != null && window.location.hostname !== domain) {
+      return Promise.reject(
+        new TypeError('Cookie domain must domain-match current host')
+      );
+    }
+
+    const results = await this.get(name);
+    if (results) {
+      const serializedValue = serialize(name, results.value, {
+        maxAge: 0,
+        domain,
+        path,
+      });
+      document.cookie = serializedValue;
+    }
     return Promise.resolve();
   },
 };
