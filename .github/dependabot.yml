@@ -4,3 +4,6 @@ updates:
     directory: '/'
     schedule:
       interval: monthly
+    allowed_updates:
+      - match:
+          update_type: 'security'
