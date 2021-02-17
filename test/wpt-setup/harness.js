@@ -1,5 +1,11 @@
 /* global assert */
 
+window.test = (fn, name) => {
+  it(name, () => {
+    fn();
+  });
+};
+
 window.promise_test = async (fn, name) => {
   const cleanups = [];
   const testCase = {
@@ -31,3 +37,5 @@ window.promise_rejects_js = async (testCase, expectedError, promise) => {
 };
 
 window.assert_equals = assert.equal;
+window.assert_true = assert.ok;
+window.assert_not_equals = assert.notEqual;
