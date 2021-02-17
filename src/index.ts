@@ -70,7 +70,7 @@ interface SerializeOptions {
   maxAge?: number;
   domain?: string;
   path?: string;
-  expires?: Date;
+  expires?: Date | number;
   httpOnly?: boolean;
   secure?: boolean;
   sameSite?: boolean | string;
@@ -196,12 +196,14 @@ function serialize(
     str += '; Path=' + opt.path;
   }
 
-  if (opt.expires) {
+  if (opt.expires instanceof Date) {
     if (typeof opt.expires.toUTCString !== 'function') {
       throw new TypeError('option expires is invalid');
     }
 
     str += '; Expires=' + opt.expires.toUTCString();
+  } else if (typeof opt.expires === 'number') {
+    str += '; Expires=' + new Date(opt.expires).toUTCString();
   }
 
   if (opt.httpOnly) {
