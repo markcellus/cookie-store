@@ -404,6 +404,14 @@ const CookieStore: CookieStore = {
       });
       document.cookie = serializedValue;
     }
+    this.onchange(
+      new CookieChangeEvent('change', {
+        changed: [],
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        deleted: [{ ...results, value: undefined }],
+      })
+    );
     return Promise.resolve();
   },
 };
