@@ -85,6 +85,23 @@ interface CookieInit {
   sameSite: CookieSameSite;
 }
 
+interface CookieListItem {
+  name: string;
+  value: string;
+  domain?: string;
+  path: string;
+  expires?: number;
+  secure: boolean;
+  sameSite: CookieSameSite;
+}
+
+type CookieList = CookieListItem[];
+
+interface CookieChangeEventInit extends EventInit {
+  changed: CookieList;
+  deleted: CookieList;
+}
+
 /**
  * Parse a cookie header.
  *
@@ -248,7 +265,35 @@ function sanitizeOptions<T>(arg: string | T): T {
   return arg;
 }
 
-const CookieStore = {
+interface CookieStore {
+  get(
+    options?: CookieStoreGetOptions['name'] | CookieStoreGetOptions
+  ): Promise<Cookie | undefined>;
+  onchange(event: CookieChangeEvent): void;
+  set(options: CookieInit | string, value?: string): Promise<void>;
+  getAll(
+    options?: CookieStoreGetOptions['name'] | CookieStoreGetOptions
+  ): Promise<Cookie[]>;
+  delete(
+    options: CookieStoreDeleteOptions['name'] | CookieStoreDeleteOptions
+  ): Promise<void>;
+}
+
+class CookieChangeEvent extends Event {
+  changed: CookieList;
+  deleted: CookieList;
+
+  constructor(
+    type: string,
+    eventInitDict: CookieChangeEventInit = { changed: [], deleted: [] }
+  ) {
+    super(type, eventInitDict);
+    this.changed = eventInitDict.changed;
+    this.deleted = eventInitDict.deleted;
+  }
+}
+
+const CookieStore: CookieStore = {
   /**
    * Get a cookie.
    *
@@ -277,44 +322,36 @@ const CookieStore = {
     return parse(document.cookie).find((cookie) => cookie.name === name);
   },
 
-  set(options: CookieInit | string, value?: string): Promise<void> {
-    if (typeof options === 'string') {
-      return new Promise((resolve, reject) => {
-        try {
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          const cookieString = serialize(options as string, value!);
-          document.cookie = cookieString;
-          resolve();
-        } catch (e) {
-          reject(e);
-        }
-      });
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  onchange() {},
+
+  async set(init: CookieInit | string, possibleValue?: string): Promise<void> {
+    const item: CookieListItem = {
+      name: '',
+      value: '',
+      path: '/',
+      secure: false,
+      sameSite: 'strict',
+    };
+    if (typeof init === 'string') {
+      item.name = init as string;
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      item.value = possibleValue!;
     } else {
-      if (options.domain?.startsWith('.')) {
-        return Promise.reject(
-          new TypeError('Cookie domain cannot start with "."')
-        );
-      } else if (
-        options.domain &&
-        options.domain !== window.location.hostname
-      ) {
-        return Promise.reject(
-          new TypeError('Cookie domain must domain-match current host')
-        );
+      Object.assign(item, init);
+
+      if (item.domain?.startsWith('.')) {
+        throw new TypeError('Cookie domain cannot start with "."');
+      } else if (item.domain && item.domain !== window.location.hostname) {
+        throw new TypeError('Cookie domain must domain-match current host');
       }
-      if (!options.path) options.path = '/';
-      if (!options.sameSite) options.sameSite = 'strict';
-      const { name, value } = sanitizeOptions<CookieInit>(options);
-      return new Promise((resolve, reject) => {
-        try {
-          const cookieString = serialize(name, value, options);
-          document.cookie = cookieString;
-          resolve();
-        } catch (e) {
-          reject(e);
-        }
-      });
     }
+
+    const cookieString = serialize(item.name, item.value, item);
+    document.cookie = cookieString;
+    this.onchange(
+      new CookieChangeEvent('change', { changed: [item], deleted: [] })
+    );
   },
 
   /**
@@ -373,11 +410,13 @@ const CookieStore = {
 
 if (!window.cookieStore) {
   window.cookieStore = CookieStore;
+  window.CookieChangeEvent = CookieChangeEvent;
 }
 
 declare global {
   interface Window {
     cookieStore: typeof CookieStore;
+    CookieChangeEvent: typeof CookieChangeEvent;
   }
 }
 
