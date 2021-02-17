@@ -55,12 +55,6 @@ describe('Cookie Store', () => {
       expect(result).to.deep.equal([]);
     });
   });
-  describe('set', () => {
-    it('updates document.cookie with supplied value', async () => {
-      await window.cookieStore.set('foo', 'bar');
-      expect(document.cookie).to.equal('foo=bar');
-    });
-  });
   describe('delete', () => {
     it('sets max age to 0 on cookie that matches supplied name', async () => {
       document.cookie = 'foo=bar';
