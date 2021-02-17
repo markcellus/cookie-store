@@ -2,9 +2,7 @@ language: node_js
 node_js:
   - '14'
 script:
-  - npm test
-  - npm run build
-  - npm run banner
+  - echo 'Travis has been deprecated for GitHub actions.'
 branches:
   only:
     - master

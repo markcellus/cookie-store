@@ -76,6 +76,15 @@ interface SerializeOptions {
   sameSite?: boolean | string;
 }
 
+interface CookieInit {
+  name: string;
+  value: string;
+  expires?: Date;
+  domain?: string;
+  path: string;
+  sameSite: CookieSameSite;
+}
+
 /**
  * Parse a cookie header.
  *
@@ -155,10 +164,6 @@ function serialize(
 
   if (typeof enc !== 'function') {
     throw new TypeError('option encode is invalid');
-  }
-
-  if (!fieldContentRegExp.test(name)) {
-    throw new TypeError('argument name is invalid');
   }
 
   const value = enc(val);
@@ -251,7 +256,9 @@ const CookieStore = {
   async get(
     options?: CookieStoreGetOptions['name'] | CookieStoreGetOptions
   ): Promise<Cookie | undefined> {
-    if (!options || !Object.keys(options).length) {
+    if (options == null) {
+      throw new TypeError('CookieStoreGetOptions must not be empty');
+    } else if (options instanceof Object && !Object.keys(options).length) {
       throw new TypeError('CookieStoreGetOptions must not be empty');
     }
     const { name, url } = sanitizeOptions<CookieStoreGetOptions>(options);
@@ -268,23 +275,44 @@ const CookieStore = {
     return parse(document.cookie).find((cookie) => cookie.name === name);
   },
 
-  /**
-   * Set a cookie.
-   *
-   * @param {string} name
-   * @param {string} value
-   * @return {Promise}
-   */
-  set(name: string, value: string): Promise<void> {
-    return new Promise((resolve, reject) => {
-      try {
-        const cookieString = serialize(name, value);
-        document.cookie = cookieString;
-        resolve();
-      } catch (e) {
-        reject(e);
+  set(options: CookieInit | string, value?: string): Promise<void> {
+    if (typeof options === 'string') {
+      return new Promise((resolve, reject) => {
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          const cookieString = serialize(options as string, value!);
+          document.cookie = cookieString;
+          resolve();
+        } catch (e) {
+          reject(e);
+        }
+      });
+    } else {
+      if (options.domain?.startsWith('.')) {
+        return Promise.reject(
+          new TypeError('Cookie domain cannot start with "."')
+        );
+      } else if (
+        options.domain &&
+        options.domain !== window.location.hostname
+      ) {
+        return Promise.reject(
+          new TypeError('Cookie domain must domain-match current host')
+        );
       }
-    });
+      if (!options.path) options.path = '/';
+      if (!options.sameSite) options.sameSite = 'strict';
+      const { name, value } = sanitizeOptions<CookieInit>(options);
+      return new Promise((resolve, reject) => {
+        try {
+          const cookieString = serialize(name, value, options);
+          document.cookie = cookieString;
+          resolve();
+        } catch (e) {
+          reject(e);
+        }
+      });
+    }
   },
 
   /**
@@ -293,11 +321,10 @@ const CookieStore = {
   async getAll(
     options?: CookieStoreGetOptions['name'] | CookieStoreGetOptions
   ): Promise<Cookie[]> {
-    if (!options) {
+    if (!options || Object.keys(options).length === 0) {
       return parse(document.cookie);
     }
-    const { name } = sanitizeOptions<CookieStoreGetOptions>(options);
-    const cookie = await this.get(name);
+    const cookie = await this.get(options);
     return cookie ? [cookie] : [];
   },
 
@@ -310,14 +337,34 @@ const CookieStore = {
   async delete(
     options: CookieStoreDeleteOptions['name'] | CookieStoreDeleteOptions
   ): Promise<void> {
-    const { name, domain } = sanitizeOptions<CookieStoreDeleteOptions>(options);
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const { value } = (await this.get(name))!;
-    const serializedValue = serialize(name, value, {
-      maxAge: 0,
-      domain,
-    });
-    document.cookie = serializedValue;
+    const parsedOptions = sanitizeOptions<CookieStoreDeleteOptions>(options);
+
+    let { path } = parsedOptions;
+    const { name, domain } = parsedOptions;
+
+    if (path === '') {
+      path = '/';
+    }
+
+    if (path != null && !path.startsWith('/')) {
+      return Promise.reject(new TypeError('Cookie path must start with "/"'));
+    }
+
+    if (domain != null && window.location.hostname !== domain) {
+      return Promise.reject(
+        new TypeError('Cookie domain must domain-match current host')
+      );
+    }
+
+    const results = await this.get(name);
+    if (results) {
+      const serializedValue = serialize(name, results.value, {
+        maxAge: 0,
+        domain,
+        path,
+      });
+      document.cookie = serializedValue;
+    }
     return Promise.resolve();
   },
 };
