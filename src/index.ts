@@ -36,7 +36,7 @@ function tryDecode(
   }
 }
 
-type CookieSameSite = 'no_restriction' | 'lax' | 'strict';
+type CookieSameSite = 'none' | 'lax' | 'strict';
 type CookieMatchType = 'equals';
 
 interface Cookie {
