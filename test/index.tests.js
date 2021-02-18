@@ -10,6 +10,23 @@ describe('Cookie Store', () => {
   afterEach(() => {
     document.cookie = '';
   });
+
+  it('is a class, instanceof CookieStore', () => {
+    expect(window.cookieStore).to.be.instanceof(window.CookieStore)
+  })
+
+  it('is an instanceof EventTarget', () => {
+    expect(window.cookieStore).to.be.instanceof(window.EventTarget)
+  })
+
+  it('has a toStringTag of CookieStore', () => {
+    expect(window.cookieStore[Symbol.toStringTag]).to.equal('CookieStore')
+  })
+
+  it('cannot be constructed', () => {
+    expect(() => new window.CookieStore()).to.throw(TypeError, 'Illegal')
+  })
+
   describe('get', () => {
     it('returns cookie matching supplied name', async () => {
       const foo = 'foo';
