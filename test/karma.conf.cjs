@@ -18,5 +18,6 @@ module.exports = function (config) {
     logLevel: config.LOG_INFO,
     browsers: ['FirefoxHeadless'],
     concurrency: Infinity,
+    hostname: 'foo.bar.localhost',
   });
 };
