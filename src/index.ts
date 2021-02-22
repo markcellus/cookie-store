@@ -120,8 +120,8 @@ class CookieChangeEvent extends Event {
     eventInitDict: CookieChangeEventInit = { changed: [], deleted: [] }
   ) {
     super(type, eventInitDict);
-    this.changed = eventInitDict.changed;
-    this.deleted = eventInitDict.deleted;
+    this.changed = eventInitDict.changed || [];
+    this.deleted = eventInitDict.deleted || [];
   }
 }
 
