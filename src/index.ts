@@ -57,13 +57,13 @@ interface CookieInit {
 }
 
 interface CookieListItem {
-  name: string;
-  value: string;
+  name?: string;
+  value?: string;
   domain?: string;
-  path: string;
+  path?: string;
   expires?: number;
-  secure: boolean;
-  sameSite: CookieSameSite;
+  secure?: boolean;
+  sameSite?: CookieSameSite;
 }
 
 type DeletedCookieListItem = CookieListItem & {
@@ -189,7 +189,7 @@ class CookieStore extends EventTarget {
     } else {
       Object.assign(item, init);
 
-      if (!item.path.startsWith('/')) {
+      if (item.path && !item.path.startsWith('/')) {
         throw new TypeError('Cookie path must start with "/"');
       }
       if (item.domain?.startsWith('.')) {
@@ -198,13 +198,13 @@ class CookieStore extends EventTarget {
       if (item.domain && item.domain !== window.location.hostname) {
         throw new TypeError('Cookie domain must domain-match current host');
       }
-      if (item.name === '' && item.value.includes('=')) {
+      if (item.name === '' && item.value && item.value.includes('=')) {
         throw new TypeError(
           "Cookie value cannot contain '=' if the name is empty"
         );
       }
 
-      if (item.path.endsWith('/')) {
+      if (item.path && item.path.endsWith('/')) {
         item.path = item.path.slice(0, -1);
       }
       if (item.path === '') {
@@ -212,7 +212,8 @@ class CookieStore extends EventTarget {
       }
     }
 
-    let cookieString = `${item.name}=${encodeURIComponent(item.value)}`;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    let cookieString = `${item.name}=${encodeURIComponent(item.value!)}`;
 
     if (item.domain) {
       cookieString += '; Domain=' + item.domain;
