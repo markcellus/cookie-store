@@ -338,12 +338,16 @@ class CookieStore extends EventTarget {
       item.value = possibleValue!;
     } else {
       Object.assign(item, init);
+    }
 
-      if (item.domain?.startsWith('.')) {
-        throw new TypeError('Cookie domain cannot start with "."');
-      } else if (item.domain && item.domain !== window.location.hostname) {
-        throw new TypeError('Cookie domain must domain-match current host');
-      }
+    if (item.domain?.startsWith('.')) {
+      throw new TypeError('Cookie domain cannot start with "."');
+    } else if (item.domain && item.domain !== window.location.hostname) {
+      throw new TypeError('Cookie domain must domain-match current host');
+    } else if (item.name === '' && item.value.includes('=')) {
+      throw new TypeError(
+        "Cookie value cannot contain '=' if the name is empty"
+      );
     }
 
     const cookieString = serialize(item.name, item.value, item);
