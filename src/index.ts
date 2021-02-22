@@ -188,27 +188,28 @@ class CookieStore extends EventTarget {
       item.value = possibleValue!;
     } else {
       Object.assign(item, init);
+
+      if (!item.path.startsWith('/')) {
+        throw new TypeError('Cookie path must start with "/"');
+      }
+      if (item.domain?.startsWith('.')) {
+        throw new TypeError('Cookie domain cannot start with "."');
+      }
+      if (item.domain && item.domain !== window.location.hostname) {
+        throw new TypeError('Cookie domain must domain-match current host');
+      }
+      if (item.name === '' && item.value.includes('=')) {
+        throw new TypeError(
+          "Cookie value cannot contain '=' if the name is empty"
+        );
+      }
+
       if (item.path.endsWith('/')) {
         item.path = item.path.substr(0, -1);
       }
       if (item.path === '') {
         item.path = '/';
       }
-    }
-
-    if (!item.path.startsWith('/')) {
-      throw new TypeError('Cookie path must start with "/"');
-    }
-    if (item.domain?.startsWith('.')) {
-      throw new TypeError('Cookie domain cannot start with "."');
-    }
-    if (item.domain && item.domain !== window.location.hostname) {
-      throw new TypeError('Cookie domain must domain-match current host');
-    }
-    if (item.name === '' && item.value.includes('=')) {
-      throw new TypeError(
-        "Cookie value cannot contain '=' if the name is empty"
-      );
     }
 
     let cookieString = `${item.name}=${encodeURIComponent(item.value)}`;
