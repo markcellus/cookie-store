@@ -66,11 +66,16 @@ interface CookieListItem {
   sameSite: CookieSameSite;
 }
 
+type DeletedCookieListItem = CookieListItem & {
+  value: undefined;
+};
+
 type CookieList = CookieListItem[];
+type DeletedCookieList = DeletedCookieListItem[];
 
 interface CookieChangeEventInit extends EventInit {
   changed: CookieList;
-  deleted: CookieList;
+  deleted: DeletedCookieList;
 }
 
 /**
@@ -128,7 +133,7 @@ function parse(str: string, options: ParseOptions = {}): Cookie[] {
 
 class CookieChangeEvent extends Event {
   changed: CookieList;
-  deleted: CookieList;
+  deleted: DeletedCookieList;
 
   constructor(
     type: string,
@@ -244,10 +249,12 @@ class CookieStore extends EventTarget {
       const deleted = [];
 
       if (previousCookie && !(await this.get(item))) {
-        deleted.push(item);
+        deleted.push({ ...item, value: undefined });
       } else {
         changed.push(item);
       }
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       const event = new CookieChangeEvent('change', { changed, deleted });
       this.onchange(event);
     }
