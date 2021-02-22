@@ -206,7 +206,7 @@ class CookieStore extends EventTarget {
       cookieString += '; Expires=' + new Date(item.expires).toUTCString();
     }
 
-    if (item.secure) {
+    if ((item.name && item.name.startsWith('__Secure')) || item.secure) {
       cookieString += '; Secure';
     }
 
