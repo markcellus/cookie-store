@@ -191,6 +191,10 @@ class CookieStore extends EventTarget {
       }
     }
 
+    if (item.name && item.name.startsWith('__Host')) {
+      item.path = '/';
+    }
+
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     let cookieString = `${item.name}=${encodeURIComponent(item.value!)}`;
 
