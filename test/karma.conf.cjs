@@ -8,7 +8,7 @@ module.exports = function (config) {
       // Our tests
       { pattern: './index.tests.js', type: 'module' },
       // Web Platform Tests
-      { pattern: './wpt/*.js', type: 'module' }
+      { pattern: './wpt/*.js', type: 'module' },
     ],
     plugins: ['karma-*'],
     reporters: ['progress'],
@@ -19,5 +19,6 @@ module.exports = function (config) {
     browsers: ['FirefoxHeadless'],
     concurrency: Infinity,
     hostname: 'foo.bar.localhost',
+    urlRoot: '/test',
   });
 };
