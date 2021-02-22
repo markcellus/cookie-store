@@ -177,11 +177,6 @@ class CookieStore extends EventTarget {
       if (item.domain && item.domain !== window.location.hostname) {
         throw new TypeError('Cookie domain must domain-match current host');
       }
-      if (item.name === '' && item.value && item.value.includes('=')) {
-        throw new TypeError(
-          "Cookie value cannot contain '=' if the name is empty"
-        );
-      }
 
       if (item.path && item.path.endsWith('/')) {
         item.path = item.path.slice(0, -1);
@@ -189,6 +184,12 @@ class CookieStore extends EventTarget {
       if (item.path === '') {
         item.path = '/';
       }
+    }
+
+    if (item.name === '' && item.value && item.value.includes('=')) {
+      throw new TypeError(
+        "Cookie value cannot contain '=' if the name is empty"
+      );
     }
 
     if (item.name && item.name.startsWith('__Host')) {
