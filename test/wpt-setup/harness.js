@@ -15,9 +15,12 @@ window.promise_test = async (fn, name) => {
     },
   };
   it(name, async () => {
-    await fn(testCase);
-    for (const cleanup of cleanups) {
-      cleanup();
+    try {
+      await fn(testCase);
+    } finally {
+      for (const cleanup of cleanups) {
+        cleanup();
+      }
     }
   });
 };
