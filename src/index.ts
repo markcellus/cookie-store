@@ -69,13 +69,7 @@ interface CookieChangeEventInit extends EventInit {
  *
  * Parse the given cookie header string into an object
  * The object has the various cookies as keys(names) => values
- *
- * @param {string} str
- * @param {object} [options]
- * @return {object}
- * @private
  */
-
 function parse(str: string, options: ParseOptions = {}): Cookie[] {
   if (typeof str !== 'string') {
     throw new TypeError('argument str must be a string');
@@ -143,12 +137,6 @@ class CookieStore extends EventTarget {
     throw new TypeError('Illegal Constructor');
   }
 
-  /**
-   * Get a cookie.
-   *
-   * @param {string} name
-   * @return {Promise}
-   */
   async get(
     init?: CookieStoreGetOptions['name'] | CookieStoreGetOptions
   ): Promise<Cookie | undefined> {
@@ -251,9 +239,6 @@ class CookieStore extends EventTarget {
     }
   }
 
-  /**
-   * Get multiple cookies.
-   */
   async getAll(
     init?: CookieStoreGetOptions['name'] | CookieStoreGetOptions
   ): Promise<Cookie[]> {
@@ -287,12 +272,6 @@ class CookieStore extends EventTarget {
     return cookies.filter((cookie) => cookie.name === name);
   }
 
-  /**
-   * Remove a cookie.
-   *
-   * @param {String} name
-   * @return {Promise}
-   */
   async delete(
     init: CookieStoreDeleteOptions['name'] | CookieStoreDeleteOptions
   ): Promise<void> {
