@@ -12,20 +12,20 @@ describe('Cookie Store', () => {
   });
 
   it('is a class, instanceof CookieStore', () => {
-    expect(window.cookieStore).to.be.instanceof(window.CookieStore)
-  })
+    expect(window.cookieStore).to.be.instanceof(window.CookieStore);
+  });
 
   it('is an instanceof EventTarget', () => {
-    expect(window.cookieStore).to.be.instanceof(window.EventTarget)
-  })
+    expect(window.cookieStore).to.be.instanceof(window.EventTarget);
+  });
 
   it('has a toStringTag of CookieStore', () => {
-    expect(window.cookieStore[Symbol.toStringTag]).to.equal('CookieStore')
-  })
+    expect(window.cookieStore[Symbol.toStringTag]).to.equal('CookieStore');
+  });
 
   it('cannot be constructed', () => {
-    expect(() => new window.CookieStore()).to.throw(TypeError, 'Illegal')
-  })
+    expect(() => new window.CookieStore()).to.throw(TypeError, 'Illegal');
+  });
 
   describe('get', () => {
     it('returns cookie matching supplied name', async () => {
@@ -70,13 +70,6 @@ describe('Cookie Store', () => {
       document.cookie = `${foo}=${bar}; ${bar}=${baz}`;
       const result = await window.cookieStore.getAll(baz);
       expect(result).to.deep.equal([]);
-    });
-  });
-  describe('delete', () => {
-    it('sets max age to 0 on cookie that matches supplied name', async () => {
-      document.cookie = 'foo=bar';
-      await window.cookieStore.delete('foo');
-      expect(document.cookie).to.equal('foo=bar; Max-Age=0');
     });
   });
 });
