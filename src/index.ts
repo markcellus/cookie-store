@@ -66,16 +66,11 @@ interface CookieListItem {
   sameSite?: CookieSameSite;
 }
 
-type DeletedCookieListItem = CookieListItem & {
-  value: undefined;
-};
-
 type CookieList = CookieListItem[];
-type DeletedCookieList = DeletedCookieListItem[];
 
 interface CookieChangeEventInit extends EventInit {
   changed: CookieList;
-  deleted: DeletedCookieList;
+  deleted: CookieList;
 }
 
 /**
@@ -133,7 +128,7 @@ function parse(str: string, options: ParseOptions = {}): Cookie[] {
 
 class CookieChangeEvent extends Event {
   changed: CookieList;
-  deleted: DeletedCookieList;
+  deleted: CookieList;
 
   constructor(
     type: string,
