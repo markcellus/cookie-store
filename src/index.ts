@@ -47,15 +47,6 @@ enum CookieSameSite {
   none = 'none',
 }
 
-interface CookieInit {
-  name: string;
-  value: string;
-  expires?: Date | number;
-  domain?: string;
-  path: string;
-  sameSite: CookieSameSite;
-}
-
 interface CookieListItem {
   name?: string;
   value?: string;
@@ -169,7 +160,10 @@ class CookieStore extends EventTarget {
     return (await this.getAll(init))[0];
   }
 
-  async set(init: CookieInit | string, possibleValue?: string): Promise<void> {
+  async set(
+    init: CookieListItem | string,
+    possibleValue?: string
+  ): Promise<void> {
     const item: CookieListItem = {
       name: '',
       value: '',
