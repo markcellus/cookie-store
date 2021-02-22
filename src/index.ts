@@ -158,6 +158,8 @@ class CookieStore extends EventTarget {
       path: '/',
       secure: false,
       sameSite: CookieSameSite.strict,
+      expires: null,
+      domain: null,
     };
     if (typeof init === 'string') {
       item.name = init as string;
@@ -281,6 +283,8 @@ class CookieStore extends EventTarget {
       path: '/',
       secure: false,
       sameSite: CookieSameSite.strict,
+      expires: null,
+      domain: null,
     };
     if (typeof init === 'string') {
       item.name = init as string;
