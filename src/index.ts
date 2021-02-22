@@ -207,6 +207,7 @@ class CookieStore extends EventTarget {
     }
 
     if ((item.name && item.name.startsWith('__Secure')) || item.secure) {
+      item.sameSite = CookieSameSite.lax;
       cookieString += '; Secure';
     }
 
