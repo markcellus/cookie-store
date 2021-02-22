@@ -218,7 +218,7 @@ class CookieStore extends EventTarget {
       cookieString += '; Domain=' + item.domain;
     }
 
-    if (item.path) {
+    if (item.path && item.path !== '/') {
       cookieString += '; Path=' + item.path;
     }
 
