@@ -205,7 +205,7 @@ class CookieStore extends EventTarget {
       }
 
       if (item.path.endsWith('/')) {
-        item.path = item.path.substr(0, -1);
+        item.path = item.path.slice(0, -1);
       }
       if (item.path === '') {
         item.path = '/';
