@@ -1,30 +1,7 @@
-/**
- * Module variables.
- * @private
- */
-
 const decode = decodeURIComponent;
-const encode = encodeURIComponent;
 const pairSplitRegExp = /; */;
 
-/**
- * RegExp to match field-content in RFC 7230 sec 3.2
- *
- * field-content = field-vchar [ 1*( SP / HTAB ) field-vchar ]
- * field-vchar   = VCHAR / obs-text
- * obs-text      = %x80-FF
- */
-
-// eslint-disable-next-line no-control-regex
-const fieldContentRegExp = /^[\u0009\u0020-\u007e\u0080-\u00ff]+$/;
-
-/**
- * Try decoding a string using a decoding function.
- *
- * @param {string} str
- * @param {function} decode
- * @private
- */
+// Try decoding a string using a decoding function.
 function tryDecode(
   str: string,
   decode: ((encodedURIComponent: string) => string) | boolean
@@ -64,17 +41,6 @@ interface ParseOptions {
   decode?: boolean;
 }
 
-interface SerializeOptions {
-  encode?: boolean;
-  maxAge?: number;
-  domain?: string;
-  path?: string;
-  expires?: Date | number;
-  httpOnly?: boolean;
-  secure?: boolean;
-  sameSite?: boolean | string;
-}
-
 enum CookieSameSite {
   strict = 'strict',
   lax = 'lax',
@@ -84,7 +50,7 @@ enum CookieSameSite {
 interface CookieInit {
   name: string;
   value: string;
-  expires?: Date;
+  expires?: Date | number;
   domain?: string;
   path: string;
   sameSite: CookieSameSite;
@@ -160,116 +126,6 @@ function parse(str: string, options: ParseOptions = {}): Cookie[] {
   return obj;
 }
 
-/**
- * Serialize data into a cookie header.
- *
- * Serialize the a name value pair into a cookie string suitable for
- * http headers. An optional options object specified cookie parameters.
- *
- * serialize('foo', 'bar', { httpOnly: true })
- *   => "foo=bar; httpOnly"
- *
- * @param {string} name
- * @param {string} val
- * @param {object} [options]
- * @return {string}
- * @private
- */
-
-function serialize(
-  name: string,
-  val: string,
-  options: SerializeOptions = {}
-): string {
-  const opt = options || {};
-  const enc = opt.encode || encode;
-
-  if (typeof enc !== 'function') {
-    throw new TypeError('option encode is invalid');
-  }
-
-  const value = enc(val);
-
-  if (value && !fieldContentRegExp.test(value)) {
-    throw new TypeError('argument val is invalid');
-  }
-
-  let str = name + '=' + value;
-
-  if (null != opt.maxAge) {
-    const maxAge = opt.maxAge - 0;
-    if (isNaN(maxAge)) throw new Error('maxAge should be a Number');
-    str += '; Max-Age=' + Math.floor(maxAge);
-  }
-
-  if (opt.domain) {
-    if (!fieldContentRegExp.test(opt.domain)) {
-      throw new TypeError('option domain is invalid');
-    }
-
-    str += '; Domain=' + opt.domain;
-  }
-
-  if (opt.path) {
-    if (!fieldContentRegExp.test(opt.path)) {
-      throw new TypeError('option path is invalid');
-    }
-
-    str += '; Path=' + opt.path;
-  }
-
-  if (opt.expires instanceof Date) {
-    if (typeof opt.expires.toUTCString !== 'function') {
-      throw new TypeError('option expires is invalid');
-    }
-
-    str += '; Expires=' + opt.expires.toUTCString();
-  } else if (typeof opt.expires === 'number') {
-    str += '; Expires=' + new Date(opt.expires).toUTCString();
-  }
-
-  if (opt.httpOnly) {
-    str += '; HttpOnly';
-  }
-
-  if (opt.secure) {
-    str += '; Secure';
-  }
-
-  if (opt.sameSite) {
-    const sameSite =
-      typeof opt.sameSite === 'string'
-        ? opt.sameSite.toLowerCase()
-        : opt.sameSite;
-
-    switch (sameSite) {
-      case true:
-        str += '; SameSite=Strict';
-        break;
-      case 'lax':
-        str += '; SameSite=Lax';
-        break;
-      case 'strict':
-        str += '; SameSite=Strict';
-        break;
-      case 'none':
-        str += '; SameSite=None';
-        break;
-      default:
-        throw new TypeError('option sameSite is invalid');
-    }
-  }
-
-  return str;
-}
-
-function sanitizeOptions<T>(arg: string | T): T {
-  if (typeof arg === 'string') {
-    return ({ name: arg } as unknown) as T;
-  }
-  return arg;
-}
-
 class CookieChangeEvent extends Event {
   changed: CookieList;
   deleted: CookieList;
@@ -303,25 +159,14 @@ class CookieStore extends EventTarget {
    * @return {Promise}
    */
   async get(
-    options?: CookieStoreGetOptions['name'] | CookieStoreGetOptions
+    init?: CookieStoreGetOptions['name'] | CookieStoreGetOptions
   ): Promise<Cookie | undefined> {
-    if (options == null) {
+    if (init == null) {
       throw new TypeError('CookieStoreGetOptions must not be empty');
-    } else if (options instanceof Object && !Object.keys(options).length) {
+    } else if (init instanceof Object && !Object.keys(init).length) {
       throw new TypeError('CookieStoreGetOptions must not be empty');
     }
-    const { name, url } = sanitizeOptions<CookieStoreGetOptions>(options);
-    if (url) {
-      const parsedURL = new URL(url, window.location.origin);
-      if (
-        window.location.href !== parsedURL.href ||
-        window.location.origin !== parsedURL.origin
-      ) {
-        throw new TypeError('URL must match the document URL');
-      }
-      return parse(document.cookie)[0];
-    }
-    return parse(document.cookie).find((cookie) => cookie.name === name);
+    return (await this.getAll(init))[0];
   }
 
   async set(init: CookieInit | string, possibleValue?: string): Promise<void> {
@@ -338,37 +183,110 @@ class CookieStore extends EventTarget {
       item.value = possibleValue!;
     } else {
       Object.assign(item, init);
+      if (item.path.endsWith('/')) {
+        item.path = item.path.substr(0, -1);
+      }
+      if (item.path === '') {
+        item.path = '/';
+      }
     }
 
+    if (!item.path.startsWith('/')) {
+      throw new TypeError('Cookie path must start with "/"');
+    }
     if (item.domain?.startsWith('.')) {
       throw new TypeError('Cookie domain cannot start with "."');
-    } else if (item.domain && item.domain !== window.location.hostname) {
+    }
+    if (item.domain && item.domain !== window.location.hostname) {
       throw new TypeError('Cookie domain must domain-match current host');
-    } else if (item.name === '' && item.value.includes('=')) {
+    }
+    if (item.name === '' && item.value.includes('=')) {
       throw new TypeError(
         "Cookie value cannot contain '=' if the name is empty"
       );
     }
 
-    const cookieString = serialize(item.name, item.value, item);
+    let cookieString = `${item.name}=${encodeURIComponent(item.value)}`;
+
+    if (item.domain) {
+      cookieString += '; Domain=' + item.domain;
+    }
+
+    if (item.path) {
+      cookieString += '; Path=' + item.path;
+    }
+
+    if (typeof item.expires === 'number') {
+      cookieString += '; Expires=' + new Date(item.expires).toUTCString();
+    }
+
+    if (item.secure) {
+      cookieString += '; Secure';
+    }
+
+    switch (item.sameSite) {
+      case CookieSameSite.lax:
+        cookieString += '; SameSite=Lax';
+        break;
+      case CookieSameSite.strict:
+        cookieString += '; SameSite=Strict';
+        break;
+      case CookieSameSite.none:
+        cookieString += '; SameSite=None';
+        break;
+    }
+
+    const previousCookie = this.get(item);
     document.cookie = cookieString;
-    if (this.onchange)
-      this.onchange(
-        new CookieChangeEvent('change', { changed: [item], deleted: [] })
-      );
+
+    if (this.onchange) {
+      const changed = [];
+      const deleted = [];
+
+      if (previousCookie && !(await this.get(item))) {
+        deleted.push(item);
+      } else {
+        changed.push(item);
+      }
+      const event = new CookieChangeEvent('change', { changed, deleted });
+      this.onchange(event);
+    }
   }
 
   /**
    * Get multiple cookies.
    */
   async getAll(
-    options?: CookieStoreGetOptions['name'] | CookieStoreGetOptions
+    init?: CookieStoreGetOptions['name'] | CookieStoreGetOptions
   ): Promise<Cookie[]> {
-    if (!options || Object.keys(options).length === 0) {
-      return parse(document.cookie);
+    const cookies = parse(document.cookie);
+    if (!init || Object.keys(init).length === 0) {
+      return cookies;
     }
-    const cookie = await this.get(options);
-    return cookie ? [cookie] : [];
+    if (init == null) {
+      throw new TypeError('CookieStoreGetOptions must not be empty');
+    } else if (init instanceof Object && !Object.keys(init).length) {
+      throw new TypeError('CookieStoreGetOptions must not be empty');
+    }
+    let name: string | undefined;
+    let url;
+    if (typeof init === 'string') {
+      name = init as string;
+    } else {
+      name = init.name;
+      url = init.url;
+    }
+    if (url) {
+      const parsedURL = new URL(url, window.location.origin);
+      if (
+        window.location.href !== parsedURL.href ||
+        window.location.origin !== parsedURL.origin
+      ) {
+        throw new TypeError('URL must match the document URL');
+      }
+      return cookies.slice(0, 1);
+    }
+    return cookies.filter((cookie) => cookie.name === name);
   }
 
   /**
@@ -378,46 +296,24 @@ class CookieStore extends EventTarget {
    * @return {Promise}
    */
   async delete(
-    options: CookieStoreDeleteOptions['name'] | CookieStoreDeleteOptions
+    init: CookieStoreDeleteOptions['name'] | CookieStoreDeleteOptions
   ): Promise<void> {
-    const parsedOptions = sanitizeOptions<CookieStoreDeleteOptions>(options);
-
-    let { path } = parsedOptions;
-    const { name, domain } = parsedOptions;
-
-    if (path === '') {
-      path = '/';
+    const item: CookieListItem = {
+      name: '',
+      value: '',
+      path: '/',
+      secure: false,
+      sameSite: CookieSameSite.strict,
+    };
+    if (typeof init === 'string') {
+      item.name = init as string;
+    } else {
+      Object.assign(item, init);
     }
 
-    if (path != null && !path.startsWith('/')) {
-      return Promise.reject(new TypeError('Cookie path must start with "/"'));
-    }
+    item.expires = 0;
 
-    if (domain != null && window.location.hostname !== domain) {
-      return Promise.reject(
-        new TypeError('Cookie domain must domain-match current host')
-      );
-    }
-
-    const results = await this.get(name);
-    if (results) {
-      const serializedValue = serialize(name, results.value, {
-        maxAge: 0,
-        domain,
-        path,
-      });
-      document.cookie = serializedValue;
-    }
-    if (this.onchange)
-      this.onchange(
-        new CookieChangeEvent('change', {
-          changed: [],
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          deleted: [{ ...results, value: undefined }],
-        })
-      );
-    return Promise.resolve();
+    await this.set(item);
   }
 }
 
