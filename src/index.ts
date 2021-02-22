@@ -52,7 +52,7 @@ interface CookieListItem {
   value?: string;
   domain: string | null;
   path?: string;
-  expires: number | null;
+  expires: Date | number | null;
   secure?: boolean;
   sameSite?: CookieSameSite;
 }
@@ -209,6 +209,8 @@ class CookieStore extends EventTarget {
 
     if (typeof item.expires === 'number') {
       cookieString += '; Expires=' + new Date(item.expires).toUTCString();
+    } else if (item.expires instanceof Date) {
+      cookieString += '; Expires=' + item.expires.toUTCString();
     }
 
     if ((item.name && item.name.startsWith('__Secure')) || item.secure) {
