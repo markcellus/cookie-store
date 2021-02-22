@@ -50,9 +50,9 @@ enum CookieSameSite {
 interface CookieListItem {
   name?: string;
   value?: string;
-  domain?: string;
+  domain: string | null;
   path?: string;
-  expires?: number;
+  expires: number | null;
   secure?: boolean;
   sameSite?: CookieSameSite;
 }
