@@ -46,7 +46,7 @@
   "scripts": {
     "pretest": "npm run build",
     "test": "npm run test:ts && eslint 'src/**/*' && npm run prettier",
-    "test:ts": "karma start test/karma.conf.cjs  --single-run",
+    "test:ts": "karma start test/karma.conf.cjs",
     "prettier": "prettier --check 'src/**/*'",
     "preversion": "npm test",
     "banner": "banner-cli dist/index.js",

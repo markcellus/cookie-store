@@ -20,5 +20,6 @@ module.exports = function (config) {
     concurrency: Infinity,
     hostname: 'foo.bar.localhost',
     urlRoot: '/test',
+    singleRun: true,
   });
 };
