@@ -9,6 +9,8 @@ module.exports = function (config) {
       { pattern: './index.tests.js', type: 'module' },
       // Web Platform Tests
       { pattern: './wpt/*.js', type: 'module' },
+      // Resources
+      { pattern: './resources/*', included: false },
     ],
     plugins: ['karma-*'],
     reporters: ['progress'],
@@ -19,7 +21,10 @@ module.exports = function (config) {
     browsers: ['FirefoxHeadless'],
     concurrency: Infinity,
     hostname: 'foo.bar.localhost',
-    urlRoot: '/test',
+    urlRoot: '/cookie-store/',
     singleRun: true,
+    proxies: {
+      '/cookie-store/resources/': '/base/resources/',
+    },
   });
 };
