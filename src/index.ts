@@ -13,8 +13,6 @@ function tryDecode(
   }
 }
 
-type CookieMatchType = 'equals';
-
 interface Cookie {
   domain?: string;
   expires?: number;
@@ -34,7 +32,6 @@ interface CookieStoreDeleteOptions {
 interface CookieStoreGetOptions {
   name?: string;
   url?: string;
-  matchType?: CookieMatchType;
 }
 
 interface ParseOptions {
