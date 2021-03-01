@@ -313,6 +313,11 @@ const workerSubscriptions = new WeakMap<
   CookieStoreGetOptions[]
 >();
 
+const registrations = new WeakMap<
+  CookieStoreManager,
+  ServiceWorkerRegistration
+>();
+
 class CookieStoreManager {
   get [Symbol.toStringTag]() {
     return 'CookieStoreManager';
@@ -324,19 +329,40 @@ class CookieStoreManager {
 
   async subscribe(subscriptions: CookieStoreGetOptions[]): Promise<void> {
     const currentSubcriptions = workerSubscriptions.get(this) || [];
-    currentSubcriptions.push(...subscriptions);
+    const worker = registrations.get(this);
+    if (!worker) throw new TypeError('Illegal invocation');
+    for (const subscription of subscriptions) {
+      const name = subscription.name;
+      const url = new URL(subscription.url || '', worker.scope).toString();
+
+      if (currentSubcriptions.some((x) => x.name === name && x.url === url))
+        continue;
+      currentSubcriptions.push({
+        name: subscription.name,
+        url,
+      });
+    }
     workerSubscriptions.set(this, currentSubcriptions);
   }
+
   async getSubscriptions(): Promise<CookieStoreGetOptions[]> {
-    return workerSubscriptions.get(this) || [];
+    return (workerSubscriptions.get(this) || []).map(({ name, url }) => ({
+      name,
+      url,
+    }));
   }
+
   async unsubscribe(subscriptions: CookieStoreGetOptions[]): Promise<void> {
     let currentSubcriptions = workerSubscriptions.get(this) || [];
+
+    const worker = registrations.get(this);
+    if (!worker) throw new TypeError('Illegal invocation');
+
     for (const subscription of subscriptions) {
       const name = subscription.name;
       // TODO: Parse the url with the relevant settings objects API base URL.
       // https://wicg.github.io/cookie-store/#CookieStoreManager-unsubscribe
-      const url = subscription.url;
+      const url = new URL(subscription.url || '', worker.scope).toString();
       currentSubcriptions = currentSubcriptions.filter((x) => {
         if (x.name !== name) return true;
         if (x.url !== url) return true;
@@ -349,7 +375,14 @@ class CookieStoreManager {
 
 if (!ServiceWorkerRegistration.prototype.cookies) {
   Object.defineProperty(ServiceWorkerRegistration.prototype, 'cookies', {
-    value: Object.create(CookieStoreManager.prototype),
+    configurable: true,
+    enumerable: true,
+    get() {
+      const manager = Object.create(CookieStoreManager.prototype);
+      registrations.set(manager, this);
+      Object.defineProperty(this, 'cookies', { value: manager });
+      return manager;
+    },
   });
 }
 
