@@ -11,6 +11,12 @@ window.test = (fn, name) => {
   });
 };
 
+const skippedTests = [
+  // We are using `document.cookie` as data store for cookies. The path
+  // property is not included in the data when we get from said store.
+  'cookieStore.set adds / to path that does not end with /',
+];
+
 window.promise_test = async (fn, name) => {
   const cleanups = [];
   const testCase = {
@@ -19,7 +25,7 @@ window.promise_test = async (fn, name) => {
       cleanups.push(fn);
     },
   };
-  it(name, async () => {
+  async function test() {
     try {
       await fn(testCase);
     } finally {
@@ -27,7 +33,8 @@ window.promise_test = async (fn, name) => {
         cleanup();
       }
     }
-  });
+  }
+  it(name, skippedTests.includes(name) ? undefined : test);
 };
 
 window.promise_rejects_js = async (testCase, expectedError, promise) => {
