@@ -303,10 +303,61 @@ class CookieStore extends EventTarget {
   }
 }
 
+interface CookieStoreGetOptions {
+  name?: string;
+  url?: string;
+}
+
+const workerSubscriptions = new WeakMap<
+  CookieStoreManager,
+  CookieStoreGetOptions[]
+>();
+
+class CookieStoreManager {
+  get [Symbol.toStringTag]() {
+    return 'CookieStoreManager';
+  }
+
+  constructor() {
+    throw new TypeError('Illegal Constructor');
+  }
+
+  async subscribe(subscriptions: CookieStoreGetOptions[]): Promise<void> {
+    const currentSubcriptions = workerSubscriptions.get(this) || [];
+    currentSubcriptions.push(...subscriptions);
+    workerSubscriptions.set(this, currentSubcriptions);
+  }
+  async getSubscriptions(): Promise<CookieStoreGetOptions[]> {
+    return workerSubscriptions.get(this) || [];
+  }
+  async unsubscribe(subscriptions: CookieStoreGetOptions[]): Promise<void> {
+    let currentSubcriptions = workerSubscriptions.get(this) || [];
+    for (const subscription of subscriptions) {
+      const name = subscription.name;
+      // TODO: Parse the url with the relevant settings objects API base URL.
+      // https://wicg.github.io/cookie-store/#CookieStoreManager-unsubscribe
+      const url = subscription.url;
+      currentSubcriptions = currentSubcriptions.filter((x) => {
+        if (x.name !== name) return true;
+        if (x.url !== url) return true;
+        return false;
+      });
+    }
+    workerSubscriptions.set(this, currentSubcriptions);
+  }
+}
+
+if (!ServiceWorkerRegistration.prototype.cookies) {
+  Object.defineProperty(ServiceWorkerRegistration.prototype, 'cookies', {
+    value: Object.create(CookieStoreManager.prototype),
+  });
+}
+
 if (!window.cookieStore) {
   window.CookieStore = CookieStore;
   window.cookieStore = Object.create(CookieStore.prototype);
   window.CookieChangeEvent = CookieChangeEvent;
+  window.CookieStoreManager = CookieStoreManager;
 }
 
 declare global {
@@ -314,6 +365,10 @@ declare global {
     CookieStore: typeof CookieStore;
     cookieStore: CookieStore;
     CookieChangeEvent: typeof CookieChangeEvent;
+    CookieStoreManager: typeof CookieStoreManager;
+  }
+  interface ServiceWorkerRegistration {
+    cookies: CookieStoreManager;
   }
 }
 
