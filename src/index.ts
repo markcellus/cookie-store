@@ -250,13 +250,8 @@ class CookieStore extends EventTarget {
     init?: CookieStoreGetOptions['name'] | CookieStoreGetOptions
   ): Promise<Cookie[]> {
     const cookies = parse(document.cookie);
-    if (!init || Object.keys(init).length === 0) {
-      return cookies;
-    }
     if (init == null) {
-      throw new TypeError('CookieStoreGetOptions must not be empty');
-    } else if (init instanceof Object && !Object.keys(init).length) {
-      throw new TypeError('CookieStoreGetOptions must not be empty');
+      return cookies;
     }
     let name: string | undefined;
     let url;
