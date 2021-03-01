@@ -250,7 +250,7 @@ class CookieStore extends EventTarget {
     init?: CookieStoreGetOptions['name'] | CookieStoreGetOptions
   ): Promise<Cookie[]> {
     const cookies = parse(document.cookie);
-    if (init == null) {
+    if (init == null || Object.keys(init).length === 0) {
       return cookies;
     }
     let name: string | undefined;
