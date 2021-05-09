@@ -4,7 +4,7 @@
   "version": "3.0.0",
   "author": "Mark",
   "license": "MIT",
-  "homepage": "https://github.com/mkay581/cookie-store",
+  "homepage": "https://github.com/markcellus/cookie-store",
   "keywords": [
     "cookie store",
     "cookie store polyfill",
@@ -18,7 +18,7 @@
   "type": "module",
   "module": "index.js",
   "types": "index.d.ts",
-  "repository": "mkay581/cookie-store",
+  "repository": "markcellus/cookie-store",
   "devDependencies": {
     "@babel/preset-env": "^7.11.0",
     "@babel/preset-typescript": "^7.10.4",
