@@ -3,7 +3,9 @@
 [![Build Status](https://travis-ci.org/mkay581/cookie-store.svg?branch=master)](https://travis-ci.org/mkay581/cookie-store)
 [![npm version](https://badge.fury.io/js/cookie-store.svg)](https://www.npmjs.com/package/cookie-store)
 
-A polyfill to allow use of the [Cookie Store API](https://wicg.github.io/cookie-store/) in modern browsers that don't support it natively, including IE11. Also compatible with TypeScript.
+A speculative polyfill to allow use of the [Cookie Store API](https://wicg.github.io/cookie-store/) in modern browsers that don't support it natively, including IE11. Also compatible with TypeScript.
+
+⚠️ **Experimantal warning:** the Cookie Store API is not a W3C standard yet and the final implementation may differ from the current API of this polyfill.
 
 ## Installation
 
