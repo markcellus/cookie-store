@@ -175,6 +175,17 @@ class CookieStore extends EventTarget {
         throw new TypeError('Cookie domain must domain-match current host');
       }
 
+      if (item.name?.startsWith('__Host') && item.domain) {
+        throw new TypeError(
+          'Cookie domain must not be specified for host cookies'
+        );
+      }
+      if (item.name?.startsWith('__Host') && item.path != '/') {
+        throw new TypeError(
+          'Cookie path must not be specified for host cookies'
+        );
+      }
+
       if (item.path && item.path.endsWith('/')) {
         item.path = item.path.slice(0, -1);
       }
@@ -190,7 +201,7 @@ class CookieStore extends EventTarget {
     }
 
     if (item.name && item.name.startsWith('__Host')) {
-      item.path = '/';
+      item.secure = true;
     }
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -200,7 +211,7 @@ class CookieStore extends EventTarget {
       cookieString += '; Domain=' + item.domain;
     }
 
-    if (item.path && item.path !== '/') {
+    if (item.path) {
       cookieString += '; Path=' + item.path;
     }
 
