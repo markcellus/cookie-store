@@ -125,7 +125,7 @@ class CookieChangeEvent extends Event {
 class CookieStore extends EventTarget {
   onchange?: (event: CookieChangeEvent) => void;
 
-  get [Symbol.toStringTag]() {
+  get [Symbol.toStringTag](): 'CookieStore' {
     return 'CookieStore';
   }
 
