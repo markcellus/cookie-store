@@ -3,7 +3,7 @@ module.exports = function (config) {
     basePath: '..',
     files: [
       // Include the compiled library
-      { pattern: './dist/index.js', type: 'module' },
+      { pattern: './dist/index.js', type: 'module', included: false },
       // Include the compiled service worker polyfill
       { pattern: './dist/service-worker.js', included: false },
       // Set up test environment to be able to run WPT tests

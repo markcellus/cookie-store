@@ -381,13 +381,6 @@ if (!ServiceWorkerRegistration.prototype.cookies) {
   });
 }
 
-if (!window.cookieStore) {
-  window.CookieStore = CookieStore;
-  window.cookieStore = Object.create(CookieStore.prototype);
-  window.CookieChangeEvent = CookieChangeEvent;
-  window.CookieStoreManager = CookieStoreManager;
-}
-
 declare global {
   interface Window {
     CookieStore: typeof CookieStore;
@@ -400,4 +393,5 @@ declare global {
   }
 }
 
-export {};
+const cookieStore = Object.create(CookieStore.prototype);
+export { cookieStore, CookieStore, CookieChangeEvent };

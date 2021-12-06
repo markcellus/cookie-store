@@ -1,4 +1,9 @@
 /* global assert */
+import {cookieStore, CookieStore, CookieChangeEvent} from '../../dist/index.js';
+
+window.cookieStore = cookieStore;
+window.CookieStore = CookieStore;
+window.CookieChangeEvent = CookieChangeEvent;
 
 self.GLOBAL = {
   isWindow: () => true,
