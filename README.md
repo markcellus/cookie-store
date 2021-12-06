@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/mkay581/cookie-store.svg?branch=master)](https://travis-ci.org/mkay581/cookie-store)
 [![npm version](https://badge.fury.io/js/cookie-store.svg)](https://www.npmjs.com/package/cookie-store)
 
-A polyfill to allow use of the [Cookie Store API](https://wicg.github.io/cookie-store/) in modern browsers that don't support it natively, including IE11. Also compatible with TypeScript.
+A ponyfill to allow use of the [Cookie Store API](https://wicg.github.io/cookie-store/) in modern browsers that don't support it natively, including IE11. Also compatible with TypeScript.
 
 ## Installation
 
@@ -15,7 +15,7 @@ npm install cookie-store
 
 ```js
 // import polyfill and declare types
-import 'cookie-store';
+import {cookieStore} from 'cookie-store';
 
 // set a cookie
 await cookieStore.set('forgive', 'me');
