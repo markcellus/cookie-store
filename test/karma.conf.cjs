@@ -1,14 +1,19 @@
 module.exports = function (config) {
   config.set({
+    basePath: '..',
     files: [
       // Include the compiled library
-      { pattern: '../dist/index.js', type: 'module' },
+      { pattern: './dist/index.js', type: 'module', included: false },
+      // Include the compiled service worker polyfill
+      { pattern: './dist/service-worker.js', included: false },
       // Set up test environment to be able to run WPT tests
-      { pattern: './wpt-setup/*.js', type: 'module' },
+      { pattern: './test/wpt-setup/*.js', type: 'module' },
       // Our tests
-      { pattern: './index.tests.js', type: 'module' },
+      { pattern: './test/index.tests.js', type: 'module' },
       // Web Platform Tests
-      { pattern: './wpt/*.js', type: 'module' },
+      { pattern: './test/wpt/*.js', type: 'module' },
+      // Resources
+      { pattern: './test/resources/*', included: false },
     ],
     plugins: ['karma-*'],
     reporters: ['progress'],
@@ -19,6 +24,10 @@ module.exports = function (config) {
     browsers: ['FirefoxHeadless'],
     concurrency: Infinity,
     hostname: 'foo.bar.localhost',
-    urlRoot: '/test',
+    urlRoot: '/cookie-store/',
+    singleRun: true,
+    proxies: {
+      '/cookie-store/resources/': '/base/test/resources/',
+    },
   });
 };
