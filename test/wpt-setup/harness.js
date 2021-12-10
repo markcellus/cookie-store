@@ -158,6 +158,11 @@ function is_state_advanced(state_a, state_b) {
   return false;
 }
 
+beforeEach(async function () {
+  const cookies = await cookieStore.getAll();
+  await Promise.all(cookies.map(({name}) => cookieStore.delete(name)));
+});
+
 window.service_worker_unregister_and_register = service_worker_unregister_and_register;
 window.assert_equals = assert.equal;
 window.assert_true = assert.ok;
