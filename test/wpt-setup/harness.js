@@ -10,10 +10,19 @@ self.GLOBAL = {
   isWorker: () => false,
 };
 
-window.test = (fn, name) => {
+window.cookie_test = window.test = (fn, name) => {
   it(name, () => {
     fn();
   });
+};
+
+window.idl_test = function (names, environments) {
+  for (const name of names) {
+    for (const environment of environments) {
+      const idl_name = `${name}_${environment}`;
+      it.skip(idl_name);
+    }
+  }
 };
 
 const skippedTests = [
