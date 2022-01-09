@@ -28,7 +28,7 @@ await cookieStore.set('forget', 'it');
 
 // get multiple cookies
 const cookies = await cookieStore.getAll();
-console.log(obj); // [{ name: 'forgive', value: 'me' }, { name: 'forget', value: 'it' }]
+console.log(cookies); // [{ name: 'forgive', value: 'me' }, { name: 'forget', value: 'it' }]
 
 // delete a cookie
 await cookieStore.delete('forget');
