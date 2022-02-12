@@ -5,7 +5,7 @@
 
 A speculative polyfill to allow use of the [Cookie Store API](https://wicg.github.io/cookie-store/) in modern browsers that don't support it natively, including IE11. Also compatible with TypeScript.
 
-⚠️ **Experimantal warning:** the Cookie Store API is not a W3C standard yet and the final implementation may differ from the current API of this polyfill.
+⚠️ **Experimental warning:** the Cookie Store API is not a W3C standard yet and the final implementation may differ from the current API of this polyfill.
 
 ## Installation
 
