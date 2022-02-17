@@ -5,12 +5,18 @@
 
 A speculative polyfill to allow use of the [Cookie Store API](https://wicg.github.io/cookie-store/) in modern browsers that don't support it natively, including IE11. Also compatible with TypeScript.
 
-⚠️ **Experimental warning:** the Cookie Store API is not a W3C standard yet and the final implementation may differ from the current API of this polyfill.
+:warning: **EXPERIMENTAL:** _The Cookie Store API is not a W3C standard yet and the final implementation may differ from the current API of this polyfill._
 
 ## Installation
 
 ```sh
 npm install cookie-store
+```
+
+Or, if you prefer to use an upcoming version of the package with more features (and closer to the final specification). Install the latest `next` version of the package. See the README on the [`next` branch](https://github.com/markcellus/cookie-store/tree/next) for the updated API.
+
+```
+npm install cookie-store@next
 ```
 
 ## Basic Example
