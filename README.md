@@ -9,13 +9,9 @@ A speculative polyfill to allow use of the [Cookie Store API](https://wicg.githu
 
 ## Installation
 
+To ensure the most up-to-date compatibility with browsers, we recommend that you install version 4 of the package with the `next` flag:
+
 ```sh
-npm install cookie-store
-```
-
-Or, if you prefer to use an upcoming version of the package with more features (and closer to the final specification). Install the latest `next` version of the package. See the README on the [`next` branch](https://github.com/markcellus/cookie-store/tree/next) for the updated API.
-
-```
 npm install cookie-store@next
 ```
 
