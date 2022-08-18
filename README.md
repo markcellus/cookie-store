@@ -19,7 +19,7 @@ npm install cookie-store@next
 
 ```js
 // import polyfill and declare types
-import {cookieStore} from 'cookie-store';
+import { cookieStore } from 'cookie-store';
 
 // set a cookie
 await cookieStore.set('forgive', 'me');
@@ -37,3 +37,15 @@ console.log(cookies); // [{ name: 'forgive', value: 'me' }, { name: 'forget', va
 // delete a cookie
 await cookieStore.delete('forget');
 ```
+
+## Development
+
+### Tests
+
+Before running tests, you'll need to add the following entry to your `/etc/hosts` file on your machine:
+
+```
+127.0.0.1    foo.bar.localhost
+```
+
+Then run `npm test`
