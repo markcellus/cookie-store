@@ -5,15 +5,27 @@ window.cookieStore = cookieStore;
 window.CookieStore = CookieStore;
 window.CookieChangeEvent = CookieChangeEvent;
 
+// True when running in a document context as opposed to a worker context
+const kHasDocument = typeof document !== 'undefined';
+
 self.GLOBAL = {
   isWindow: () => true,
   isWorker: () => false,
 };
 
-window.test = (fn, name) => {
+window.cookie_test = window.test = (fn, name) => {
   it(name, () => {
     fn();
   });
+};
+
+window.idl_test = function (names, environments) {
+  for (const name of names) {
+    for (const environment of environments) {
+      const idl_name = `${name}_${environment}`;
+      it.skip(idl_name);
+    }
+  }
 };
 
 const skippedTests = [
@@ -21,6 +33,36 @@ const skippedTests = [
   // property is not included in the data when we get from said store.
   'cookieStore.set adds / to path that does not end with /',
 ];
+
+window.observeNextCookieChangeEvent = function() {
+  return new Promise(resolve => {
+    cookieStore.addEventListener('change', e => resolve(e), {once: true});
+  });
+}
+
+// Async document.cookie setter
+window.setCookieStringDocument = async function(setCookie) {
+  if (!kHasDocument)
+    throw 'document.cookie not available in this context';
+  document.cookie = setCookie;
+}
+
+// Approximate async equivalent to the document.cookie getter but with
+// important differences: optional additional getAll arguments are
+// forwarded, and an empty cookie jar returns undefined.
+//
+// This is intended primarily for verification against expected cookie
+// jar contents. It should produce more readable messages using
+// assert_equals in failing cases than assert_object_equals would
+// using parsed cookie jar contents and also allows expectations to be
+// written more compactly.
+window.getCookieString = async function(...args) {
+  const cookies = await cookieStore.getAll(...args);
+  return cookies.length
+    ? cookies.map(({name, value}) =>
+                  (name ? (name + '=') : '') + value).join('; ')
+    : undefined;
+}
 
 window.promise_test = async (fn, name) => {
   const cleanups = [];
@@ -148,6 +190,11 @@ function is_state_advanced(state_a, state_b) {
   }
   return false;
 }
+
+beforeEach(async function () {
+  const cookies = await cookieStore.getAll();
+  await Promise.all(cookies.map(({name}) => cookieStore.delete(name)));
+});
 
 window.service_worker_unregister_and_register = service_worker_unregister_and_register;
 window.assert_equals = assert.equal;
