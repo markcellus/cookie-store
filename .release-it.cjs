@@ -9,7 +9,6 @@ module.exports = {
     release: true,
     releaseName: '${version}',
     releaseNotes: null,
-    assets: ['dist/index.js', 'dist/index.d.ts'],
   },
   hooks: {
     'after:bump': 'npm run banner',
