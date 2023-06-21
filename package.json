@@ -27,7 +27,7 @@
     "banner-cli": "^0.14.1",
     "chai": "^4.2.0",
     "eslint": "^7.14.0",
-    "husky": "^4.2.3",
+    "husky": "^8.0.3",
     "karma": "^5.2.3",
     "karma-chai": "^0.1.0",
     "karma-firefox-launcher": "^2.1.0",
