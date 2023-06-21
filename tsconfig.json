@@ -4,6 +4,7 @@
     "module": "esnext",
     "strict": true,
     "noImplicitThis": true,
+    "noImplicitAny": true,
     "alwaysStrict": true,
     "esModuleInterop": true,
     "declaration": true,

@@ -404,5 +404,6 @@ declare global {
   }
 }
 
-const cookieStore = Object.create(CookieStore.prototype);
+const cookieStore = Object.create(CookieStore.prototype) as CookieStore;
+
 export { cookieStore, CookieStore, CookieChangeEvent };
